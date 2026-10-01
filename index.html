@@ -1,84 +1,323 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#1d1d1b" />
-  <meta name="description" content="น้ำมนต์ 99 Stock — ระบบสต๊อกรถหลายเครื่องสำหรับพนักงาน" />
-  <link rel="manifest" href="manifest.webmanifest" />
-  <title>น้ำมนต์ 99 Stock</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  <style>
-    :root{--bg:#f7f7f4;--card:#fff;--ink:#1d1d1b;--muted:#777;--line:#e8e8e3;--accent:#1d1d1b;--danger:#a33;--ok:#236b48;--soft:#f0f0ec;--shadow:0 8px 28px rgba(0,0,0,.06)}
-    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    button,input,select,textarea{font:inherit} button{border:0;cursor:pointer}.hidden{display:none!important}
-    .wrap{max-width:1050px;margin:0 auto;padding:18px 14px 88px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.brand{font-weight:800;letter-spacing:-.02em}.sub{font-size:12px;color:var(--muted)}
-    .btn{background:var(--ink);color:#fff;padding:10px 13px;border-radius:12px;font-weight:700}.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}.btn.danger{background:#8d3030}.btn.small{padding:8px 10px;font-size:13px}
-    .search{position:sticky;top:0;z-index:10;background:rgba(247,247,244,.92);backdrop-filter:blur(12px);padding:4px 0 12px}.searchbox{display:flex;gap:8px}.searchbox input{flex:1;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:#fff;outline:none}.searchbox input:focus{border-color:#bbb}
-    .chips{display:flex;gap:8px;overflow:auto;padding:8px 2px 2px}.chip{white-space:nowrap;padding:8px 11px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:12px}.chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
-    .cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px}.stat b{font-size:23px;display:block}.stat span{font-size:12px;color:var(--muted)}
-    .section{margin-top:14px}.sectionhead{display:flex;justify-content:space-between;align-items:center;margin:4px 0 10px}.sectionhead h2{font-size:17px;margin:0}.muted{color:var(--muted)}
-    .carlist{display:grid;gap:10px}.car{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.car .main{min-width:0}.car .name{font-weight:800;font-size:16px}.meta{font-size:13px;color:#666;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.money{font-weight:800;margin-top:6px}.status{font-size:11px;padding:5px 8px;border:1px solid var(--line);border-radius:999px;white-space:nowrap;background:var(--soft)}
-    .empty{padding:30px;text-align:center;color:var(--muted);border:1px dashed #d7d7d0;border-radius:16px;background:rgba(255,255,255,.6)}
-    .fabrow{position:fixed;left:0;right:0;bottom:0;background:rgba(247,247,244,.97);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:10px;display:flex;gap:8px;justify-content:center;z-index:20}.fabrow .btn{flex:1;max-width:320px}
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:50;display:flex;align-items:flex-end;justify-content:center}.sheet{background:#fff;width:100%;max-width:760px;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:18px}.close{float:right;width:36px;height:36px;border-radius:50%;background:var(--soft)}
-    .fieldgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.field{display:flex;flex-direction:column;gap:5px}.field.full{grid-column:1/-1}.field label{font-size:12px;color:#666}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:#fff;outline:none}.field textarea{min-height:82px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:#bbb}
-    .toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar .btn{flex:0 0 auto}.quick{background:#f3f3ef;border:1px solid var(--line);border-radius:16px;padding:12px}.quick textarea{width:100%;border:0;background:transparent;resize:none;outline:none}.hint{font-size:11px;color:var(--muted)}
-    .detailhead{display:flex;justify-content:space-between;gap:12px}.detailtitle{font-size:22px;font-weight:900}.detailmeta{font-size:13px;color:#666}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}.mini{border:1px solid var(--line);border-radius:15px;padding:10px}.mini label{font-size:11px;color:#777;display:block}.mini b{font-size:16px}.accordion{border-top:1px solid var(--line)}details{border-bottom:1px solid var(--line);padding:12px 0}summary{cursor:pointer;font-weight:800;list-style:none}summary::-webkit-details-marker{display:none}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tablewrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:12px}.table th,.table td{border-bottom:1px solid var(--line);padding:8px;text-align:right;white-space:nowrap}.table th:first-child,.table td:first-child{text-align:left}
-    .login{min-height:100vh;display:grid;place-items:center;padding:20px}.loginbox{width:100%;max-width:420px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:24px;padding:24px}.loginbox h1{margin:0 0 4px;font-size:25px}.loginbox p{margin:0 0 18px;color:var(--muted);font-size:13px}.notice{padding:11px 12px;border-radius:12px;background:#f1f1ed;border:1px solid var(--line);font-size:12px;margin-bottom:12px}.notice.err{background:#fff0f0;color:var(--danger);border-color:#f0caca}.setup{font-size:12px;color:#666;line-height:1.6}
-    .toast{position:fixed;left:50%;bottom:74px;transform:translateX(-50%) translateY(14px);background:#1d1d1b;color:#fff;padding:10px 13px;border-radius:12px;font-size:12px;opacity:0;pointer-events:none;transition:.2s;z-index:90}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    @media(max-width:640px){.cards3{gap:7px}.stat{padding:11px}.stat b{font-size:20px}.car{padding:12px}.grid4{grid-template-columns:repeat(2,1fr)}.fieldgrid,.two{grid-template-columns:1fr}.wrap{padding-left:11px;padding-right:11px}.detailtitle{font-size:19px}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111110">
+<title>น้ำมนต์ 99 Stock</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style>
+:root{
+  --bg:#f5f5f2;--surface:#fff;--ink:#171716;--muted:#74746f;--line:#e6e6e0;
+  --soft:#f0f0ec;--green:#236b48;--red:#a13a32;--shadow:0 12px 34px rgba(22,22,20,.07);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh}
+.container{width:min(980px,100%);margin:auto;padding:14px 12px 110px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.title{font-size:20px;font-weight:850;letter-spacing:-.02em}
+.subtitle{font-size:12px;color:var(--muted);margin-top:2px}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:13px;padding:10px 13px;font-weight:750}
+.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.small{font-size:12px;padding:8px 10px}
+.btn.ghost{background:#fff}
+.btn.danger{color:var(--red)}
+.editorHead{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
+.carTitle{font-size:22px;font-weight:900;line-height:1.2}
+.carMeta{color:var(--muted);font-size:13px;margin-top:4px}
+.statusPill{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--soft);padding:7px 10px;border-radius:999px;font-size:12px;font-weight:750;margin-top:11px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.section{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px}
+.sectionTitle{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.sectionTitle strong{font-size:15px}
+.sectionHint{font-size:11px;color:var(--muted)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1/-1}
+label{font-size:11px;color:#666}
+input,select,textarea{width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 12px;outline:none;color:var(--ink)}
+input:focus,select:focus,textarea:focus{border-color:#b8b8b1;box-shadow:0 0 0 3px #f0f0ec}
+input[type=number]{font-variant-numeric:tabular-nums}
+.moneyRow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.moneyCard{border:1px solid var(--line);border-radius:15px;padding:11px;background:linear-gradient(#fff,#fafaf7)}
+.moneyLabel{font-size:11px;color:var(--muted)}
+.moneyValue{font-size:18px;font-weight:900;margin-top:3px}
+.moneySub{font-size:11px;color:var(--muted);margin-top:3px}
+.accordion{display:flex;flex-direction:column;gap:8px}
+details{border:1px solid var(--line);border-radius:14px;background:#fff}
+summary{list-style:none;padding:12px 13px;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+summary::-webkit-details-marker{display:none}
+summary:after{content:"+";color:var(--muted);font-size:18px;font-weight:400}
+details[open] summary:after{content:"−"}
+.detailBody{padding:0 13px 13px}
+.notice{padding:10px 12px;border-radius:12px;background:var(--soft);font-size:12px;color:#555;margin-bottom:10px}
+.notice.error{background:#fff0ef;color:#8e312a}
+.costSummary{display:flex;align-items:baseline;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+.costSummary span{font-size:12px;color:var(--muted)}
+.costSummary b{font-size:20px}
+.bottomBar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:10px;z-index:30}
+.bottomInner{width:min(980px,100%);margin:auto;display:flex;gap:8px}
+.bottomInner .btn{flex:1}
+.listCard{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px;border:1px solid var(--line);border-radius:16px;background:#fff;margin-bottom:8px}
+.listMain{min-width:0}
+.listName{font-weight:850}
+.listMeta{font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.listSide{text-align:right;flex:none}
+.listPrice{font-weight:850;font-size:13px;margin-top:5px}
+.search{background:#fff;border:1px solid var(--line);border-radius:15px;padding:11px;margin-bottom:12px}
+.empty{text-align:center;padding:38px 10px;color:var(--muted);font-size:13px}
+.login{min-height:100vh;display:grid;place-items:center;padding:18px}
+.loginBox{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:22px;padding:23px;box-shadow:var(--shadow)}
+.loginBox h1{margin:0;font-size:24px}
+.loginBox p{margin:4px 0 18px;color:var(--muted);font-size:12px}
+.toast{position:fixed;left:50%;bottom:78px;transform:translate(-50%,12px);opacity:0;pointer-events:none;background:#171716;color:#fff;padding:10px 13px;border-radius:12px;font-size:12px;transition:.18s;z-index:60}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(min-width:760px){.container{padding:22px 16px 110px}.editorLayout{display:grid;grid-template-columns:1.2fr .8fr;gap:10px}.fullSection{grid-column:1/-1}}
+@media(max-width:620px){.grid{grid-template-columns:1fr}.moneyRow{grid-template-columns:1fr 1fr}.carTitle{font-size:19px}.container{padding-left:10px;padding-right:10px}.section{padding:12px}.bottomInner .btn{padding:11px 9px}}
+</style>
 </head>
 <body>
-<div id="app"></div>
+<div id="app" class="app"></div>
 <div id="toast" class="toast"></div>
-
 <script>
-const CFG = window.APP_CONFIG || {};
-const configured = CFG.supabaseUrl && !CFG.supabaseUrl.includes('YOUR-PROJECT') && CFG.supabaseAnonKey && !CFG.supabaseAnonKey.includes('YOUR-ANON');
-let sb = configured ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey) : null;
-let state = { cars:[], expenses:[], history:[], me:null, filter:'ทั้งหมด', q:'', selected:null };
-const statuses = ['ทั้งหมด','รอตรวจสภาพ','กำลังซ่อม','เตรียมรถ','พร้อมขาย','จองแล้ว','ขายแล้ว','ยกเลิก'];
-const money = n => (Number(n)||0).toLocaleString('th-TH',{maximumFractionDigits:0});
-const dateTH = s => s ? new Date(s+'T00:00:00').toLocaleDateString('th-TH') : '-';
-const today = () => new Date().toISOString().slice(0,10);
-const esc = s => String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-function toast(msg){const e=document.getElementById('toast');e.textContent=msg;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2200)}
-function stockAge(d){if(!d)return '-';return Math.max(0,Math.floor((Date.now()-new Date(d+'T00:00:00'))/86400000))+' วัน'}
-function totalExpense(carId){return state.expenses.filter(x=>x.car_id===carId).reduce((a,x)=>a+Number(x.amount||0),0)}
-function filteredCars(){const q=state.q.trim().toLowerCase();return state.cars.filter(c=>(state.filter==='ทั้งหมด'||c.status===state.filter)&&(!q||[c.brand,c.model,c.trim,c.plate,c.color,c.vin,String(c.year||'')].join(' ').toLowerCase().includes(q))).sort((a,b)=>new Date(b.updated_at)-new Date(a.updated_at));}
-function updateHomeSearch(){const list=filteredCars();const el=document.getElementById('carList');if(el)el.innerHTML=list.length?list.map(card).join(''):`<div class="empty">ไม่พบรถที่ค้นหา</div>`;const rc=document.getElementById('resultCount');if(rc)rc.textContent=list.length+' คัน';}
-async function load(){if(!sb)return;const {data:userData}=await sb.auth.getUser();state.me=userData?.user||null;if(!state.me){renderLogin();return;}const {data:emp}=await sb.from('employees').select('*').eq('user_id',state.me.id).maybeSingle();if(!emp?.active){await sb.auth.signOut();renderLogin('บัญชีนี้ยังไม่ได้รับสิทธิ์เข้าระบบ');return;}state.emp=emp;const [{data:cars},{data:ex},{data:hist}]=await Promise.all([sb.from('cars').select('*').order('updated_at',{ascending:false}),sb.from('car_expenses').select('*').order('expense_date',{ascending:false}),sb.from('valuation_history').select('*').order('effective_date',{ascending:false})]);state.cars=cars||[];state.expenses=ex||[];state.history=hist||[];renderHome();}
-function renderLogin(err=''){document.getElementById('app').innerHTML=`<div class="login"><div class="loginbox"><h1>น้ำมนต์ 99 Stock</h1><p>ระบบสต๊อกรถสำหรับทีมงานภายใน</p>${!configured?`<div class="notice err">ยังไม่ได้เชื่อมฐานข้อมูล Supabase<br><span class="setup">คัดลอก <b>config.example.js</b> เป็น <b>config.js</b> แล้วใส่ Project URL + anon/publishable key</span></div>`:''}${err?`<div class="notice err">${esc(err)}</div>`:''}<div class="field"><label>อีเมลพนักงาน</label><input id="loginEmail" type="email" autocomplete="username"></div><div style="height:8px"></div><div class="field"><label>รหัสผ่าน</label><input id="loginPass" type="password" autocomplete="current-password"></div><button class="btn" style="width:100%;margin-top:12px" onclick="login()">เข้าสู่ระบบ</button><div class="setup" style="margin-top:14px">บัญชีพนักงานต้องถูกสร้างและเปิดสิทธิ์โดยผู้ดูแลเท่านั้น ไม่มีปุ่มสมัครสมาชิกเอง</div></div></div>`}
-async function login(){if(!sb){toast('ยังไม่ได้เชื่อม Supabase');return}const email=document.getElementById('loginEmail').value.trim();const password=document.getElementById('loginPass').value;const {error}=await sb.auth.signInWithPassword({email,password});if(error){renderLogin(error.message);return}await load()}
-async function logout(){await sb.auth.signOut();state={cars:[],expenses:[],history:[],me:null};renderLogin();}
-function renderHome(){const list=filteredCars();const active=state.cars.filter(c=>!['ขายแล้ว','ยกเลิก'].includes(c.status));const total=active.length, ready=active.filter(c=>c.status==='พร้อมขาย').length;const cost=active.reduce((a,c)=>a+Number(c.purchase_price||0)+totalExpense(c.id),0);document.getElementById('app').innerHTML=`<div class="wrap"><div class="topbar"><div><div class="brand">น้ำมนต์ 99 STOCK</div><div class="sub">${esc(state.emp?.display_name||state.me?.email||'')}</div></div><button class="btn ghost small" onclick="logout()">ออก</button></div><div class="search"><div class="searchbox"><input placeholder="ค้นหาทะเบียน / รุ่น / ยี่ห้อ / สี / เลขตัวถัง" value="${esc(state.q)}" oninput="state.q=this.value;updateHomeSearch()"></div><div class="chips">${statuses.map(s=>`<button class="chip ${state.filter===s?'active':''}" onclick="state.filter='${s}';renderHome()">${s}</button>`).join('')}</div></div><div class="cards3"><div class="stat"><b>${total}</b><span>รถในสต๊อก</span></div><div class="stat"><b>${ready}</b><span>พร้อมขาย</span></div><div class="stat"><b>${money(cost)}</b><span>ต้นทุนที่บันทึกแล้ว</span></div></div><div class="section"><div class="sectionhead"><h2>รายการรถ</h2><span id="resultCount" class="muted" style="font-size:12px">${list.length} คัน</span></div><div id="carList" class="carlist">${list.length?list.map(card).join(''):`<div class="empty">ไม่พบรถที่ค้นหา</div>`}</div></div></div><div class="fabrow"><button class="btn ghost" onclick="openQuick()">⌨️ เพิ่มแบบสั้น</button><button class="btn ghost" onclick="voiceInput()">🎙️ พูด</button><button class="btn" onclick="openCar()">＋ เพิ่มรถ</button></div>`;}
-function card(c){const cost=Number(c.purchase_price||0)+totalExpense(c.id);return `<button class="car" onclick="openDetail('${c.id}')"><div class="main"><div class="name">${esc(c.brand)} ${esc(c.model)}${c.trim?' '+esc(c.trim):''}</div><div class="meta">${esc(c.plate||'ไม่มีทะเบียน')} • ${esc(c.year||'-')} • ${esc(c.color||'-')}</div><div class="money">ซื้อ ${money(c.purchase_price)} บาท</div></div><div style="text-align:right"><div class="status">${esc(c.status)}</div><div class="meta" style="margin-top:8px">ต้นทุน ${money(cost)}</div><div class="meta">${stockAge(c.purchase_date)}</div></div></button>`}
-function openQuick(){showModal(`<div class="sheet"><button class="close" onclick="closeModal()">×</button><h2>เพิ่มรถแบบสั้น</h2><div class="quick"><textarea id="quickText" placeholder="เช่น City V 2013 ขาว กข1234 ซื้อ185000\nหรือ: กข1234 เพิ่มค่าซ่อม 8500"></textarea><div class="hint">ระบบจะหาเลขทะเบียนก่อน ถ้าพบรถเดิมจะอัปเดตคันเดิม</div></div><div class="toolbar" style="margin-top:12px"><button class="btn" onclick="parseQuick()">วิเคราะห์</button><button class="btn ghost" onclick="voiceInput('quickText')">🎙️ พูดใส่ช่องนี้</button></div><div id="quickResult" style="margin-top:12px"></div></div>`)}
-function normalizePlate(s){return String(s||'').replace(/\s/g,'').replace(/-/g,'').toLowerCase()}
-function parseQuick(){const raw=document.getElementById('quickText').value.trim();if(!raw){toast('ใส่ข้อความก่อน');return}const plate=(raw.match(/([ก-ฮ]{1,3}\s*\d{1,4})/i)||[])[1]||'';const existing=plate?state.cars.find(c=>normalizePlate(c.plate)===normalizePlate(plate)):null;const expense=raw.match(/(?:เพิ่ม|ค่า)(?:ซ่อม|ใช้จ่าย)?\s*(?:ค่า)?(?:ซ่อม|ยาง|สี|โอน|ภาษี|ใช้จ่าย)?\s*(\d[\d,]*)/i);const purchase=raw.match(/(?:ซื้อ(?:เข้า)?|ทุน)\s*(\d[\d,]*)/i);let m=raw.match(/(19\d\d|20\d\d)/);const year=m?Number(m[1]):'';const price=purchase?Number(purchase[1].replace(/,/g,'')):null;let brand='';let model='';let trim='';const known=['Toyota','Honda','Nissan','Isuzu','Ford','Mazda','Mitsubishi','Suzuki','MG','BYD','GWM','BMW','Mercedes','Hyundai','Kia'];const bm=known.find(x=>raw.toLowerCase().includes(x.toLowerCase()));if(bm)brand=bm;const modelMatch=raw.match(/(?:Toyota\s*)?(Yaris|City|March|D-Max|Ranger|CX-5|Civic|Jazz|Fortuner|Hilux|Vios|Almera|Navara)/i);if(modelMatch)model=modelMatch[1];const colors=['ขาว','ดำ','แดง','เทา','เงิน','น้ำเงิน','ฟ้า','เขียว','ครีม','บรอนซ์'];const color=colors.find(x=>raw.includes(x))||'';let html='';if(existing){html+=`<div class="notice">พบรถเดิม <b>${esc(existing.brand)} ${esc(existing.model)}</b> ทะเบียน <b>${esc(existing.plate)}</b><br>ระบบจะอัปเดตรายการเดิม ไม่สร้างรถใหม่</div>`;if(expense)html+=`<div class="notice">จะเพิ่มค่าใช้จ่าย <b>${money(Number(expense[1].replace(/,/g,'')))} บาท</b></div>`;html+=`<button class="btn" onclick="applyQuickExisting('${existing.id}',${expense?Number(expense[1].replace(/,/g,'')):0})">ยืนยันการแก้ไข</button>`;}else{html+=`<div class="notice">กำลังจะสร้างรถใหม่<br><b>${esc(brand||'ไม่ทราบยี่ห้อ')} ${esc(model||'ไม่ทราบรุ่น')}</b> ${year||''} ${color||''} ${plate||''}<br>${price?`ราคาซื้อ ${money(price)} บาท`:''}</div>`;html+=`<button class="btn" onclick='openCarFromQuick(${JSON.stringify({brand,model,trim,year,plate,color,purchase_price:price||0})})'>เปิดฟอร์มตรวจสอบ</button>`;}document.getElementById('quickResult').innerHTML=html}
-async function applyQuickExisting(id,amount){if(amount){const {error}=await sb.from('car_expenses').insert({car_id:id,expense_type:'อื่น ๆ',amount,expense_date:today(),note:'เพิ่มผ่าน Quick Input',created_by:state.me.id});if(error)return toast(error.message)}await audit('cars',id,'quick_update','แก้ไขรถผ่าน Quick Input');closeModal();await load();toast('อัปเดตรถเดิมแล้ว')}
-function openCarFromQuick(x){closeModal();openCar(x)}
-function openCar(data={}){showModal(carForm(data))}
-function openCarById(id){const c=state.cars.find(x=>x.id===id);if(c)openCar(c)}
-function carForm(c={},mode='new'){return `<div class="sheet"><button class="close" onclick="closeModal()">×</button><h2>${c.id?'แก้ไขรถ':'เพิ่มรถ'}</h2><form id="carForm" onsubmit="saveCar(event)"><input type="hidden" name="id" value="${esc(c.id||'')}"><div class="fieldgrid"><div class="field"><label>ยี่ห้อ *</label><input name="brand" required value="${esc(c.brand||'')}"></div><div class="field"><label>รุ่น *</label><input name="model" required value="${esc(c.model||'')}"></div><div class="field"><label>รุ่นย่อย</label><input name="trim" value="${esc(c.trim||'')}"></div><div class="field"><label>ปี</label><input name="year" inputmode="numeric" value="${esc(c.year||'')}"></div><div class="field"><label>ทะเบียน</label><input name="plate" value="${esc(c.plate||'')}"></div><div class="field"><label>สี</label><input name="color" value="${esc(c.color||'')}"></div><div class="field"><label>เลขตัวถัง (VIN)</label><input name="vin" value="${esc(c.vin||'')}"></div><div class="field"><label>เลขไมล์</label><input name="mileage" inputmode="numeric" value="${esc(c.mileage||'')}"></div><div class="field"><label>วันที่ซื้อเข้า</label><input name="purchase_date" type="date" value="${esc(c.purchase_date||today())}"></div><div class="field"><label>ราคาซื้อเข้า</label><input name="purchase_price" inputmode="decimal" value="${esc(c.purchase_price||0)}"></div><div class="field"><label>TTB ราคากลาง</label><input name="ttb_price" inputmode="decimal" value="${esc(c.ttb_price??'')}"></div><div class="field"><label>TTB ข้อมูล ณ วันที่</label><input name="ttb_effective_date" type="date" value="${esc(c.ttb_effective_date||'')}"></div><div class="field"><label>Tisco ราคากลาง</label><input name="tisco_price" inputmode="decimal" value="${esc(c.tisco_price??'')}"></div><div class="field"><label>Tisco ข้อมูล ณ วันที่</label><input name="tisco_effective_date" type="date" value="${esc(c.tisco_effective_date||'')}"></div><div class="field"><label>ราคาตั้งขาย</label><input name="asking_price" inputmode="decimal" value="${esc(c.asking_price??'')}"></div><div class="field"><label>สถานะ</label><select name="status">${statuses.slice(1).map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('')}</select></div><div class="field full"><label>หมายเหตุ</label><textarea name="notes">${esc(c.notes||'')}</textarea></div></div><div class="toolbar" style="margin-top:12px"><button class="btn" type="submit">บันทึก</button><button class="btn ghost" type="button" onclick="closeModal()">ยกเลิก</button></div></form></div>`}
-async function saveCar(e){e.preventDefault();const f=new FormData(e.target);const obj=Object.fromEntries(f.entries());['year','mileage'].forEach(k=>obj[k]=obj[k]?Number(obj[k]):null);['purchase_price','ttb_price','tisco_price','asking_price'].forEach(k=>obj[k]=obj[k]?Number(String(obj[k]).replace(/,/g,'')):null);obj.purchase_price=obj.purchase_price||0;obj.updated_by=state.me.id;const id=obj.id||null;if(id)delete obj.id;let result=id?await sb.from('cars').update(obj).eq('id',id):await sb.from('cars').insert(obj);if(result.error){toast('บันทึกไม่สำเร็จ: '+result.error.message);return}const targetId=id;await audit('cars',targetId,'update',id?'แก้ไขข้อมูลรถ':'เพิ่มรถใหม่');closeModal();await load();if(targetId&&state.cars.some(c=>c.id===targetId))openDetail(targetId);toast(id?'อัปเดตข้อมูลรถแล้ว':'เพิ่มรถแล้ว')}
-function openDetail(id){const c=state.cars.find(x=>x.id===id);if(!c)return;state.selected=id;const ex=state.expenses.filter(x=>x.car_id===id);const hist=state.history.filter(x=>x.car_id===id);const cost=Number(c.purchase_price||0)+ex.reduce((a,x)=>a+Number(x.amount||0),0);document.getElementById('app').innerHTML=`<div class="wrap"><div class="topbar"><button class="btn ghost small" onclick="renderHome()">← กลับ</button><div class="toolbar"><button class="btn ghost small" onclick="openCarById('${c.id}')">✏️ แก้ไข</button><button class="btn small" onclick="openQuickEdit('${c.id}')">⌨️ Quick</button></div></div><div class="detailhead"><div><div class="detailtitle">${esc(c.brand)} ${esc(c.model)}${c.trim?' '+esc(c.trim):''}</div><div class="detailmeta">${esc(c.plate||'ไม่มีทะเบียน')} • ${esc(c.year||'-')} • ${esc(c.color||'-')} • ${esc(c.status)}</div></div></div><div class="grid4"><div class="mini"><label>ราคาซื้อเข้า</label><b>${money(c.purchase_price)}</b></div><div class="mini"><label>ค่าใช้จ่ายสะสม</label><b>${money(ex.reduce((a,x)=>a+Number(x.amount||0),0))}</b></div><div class="mini"><label>ต้นทุนที่บันทึก</label><b>${money(cost)}</b></div><div class="mini"><label>ราคาตั้งขาย</label><b>${c.asking_price?money(c.asking_price):'-'}</b></div></div><div class="accordion"><details open><summary>ข้อมูลรถ</summary><div class="two" style="margin-top:10px"><div><b>ยี่ห้อ / รุ่น</b><br>${esc(c.brand)} ${esc(c.model)} ${esc(c.trim||'')}</div><div><b>ทะเบียน</b><br>${esc(c.plate||'-')}</div><div><b>VIN</b><br>${esc(c.vin||'-')}</div><div><b>เลขไมล์</b><br>${c.mileage?money(c.mileage):'-'}</div><div><b>วันที่ซื้อเข้า</b><br>${dateTH(c.purchase_date)}</div><div><b>อายุสต๊อก</b><br>${stockAge(c.purchase_date)}</div></div></details><details><summary>ราคากลาง TTB / Tisco</summary><div class="two" style="margin-top:10px"><div class="mini"><label>TTB</label><b>${c.ttb_price?money(c.ttb_price)+' บาท':'-'}</b><div class="muted">ข้อมูล ณ ${dateTH(c.ttb_effective_date)}</div></div><div class="mini"><label>Tisco</label><b>${c.tisco_price?money(c.tisco_price)+' บาท':'-'}</b><div class="muted">ข้อมูล ณ ${dateTH(c.tisco_effective_date)}</div></div></div><div class="tablewrap" style="margin-top:10px"><table class="table"><thead><tr><th>% ราคากลาง</th><th>TTB</th><th>Tisco</th></tr></thead><tbody>${[100,95,90,85,80,70].map(p=>`<tr><td>${p}%</td><td>${c.ttb_price?money(Number(c.ttb_price)*p/100):'-'}</td><td>${c.tisco_price?money(Number(c.tisco_price)*p/100):'-'}</td></tr>`).join('')}</tbody></table></div></details><details><summary>ค่าใช้จ่าย</summary><div class="toolbar" style="margin:8px 0"><button class="btn small" onclick="addExpense('${c.id}')">＋ เพิ่มค่าใช้จ่าย</button></div>${ex.length?`<div class="tablewrap"><table class="table"><thead><tr><th>รายการ</th><th>วันที่</th><th>จำนวน</th><th></th></tr></thead><tbody>${ex.map(x=>`<tr><td>${esc(x.expense_type)}${x.note?'<div class="muted">'+esc(x.note)+'</div>':''}</td><td>${dateTH(x.expense_date)}</td><td>${money(x.amount)}</td><td><button class="btn ghost small" onclick="editExpense('${x.id}')">แก้</button></td></tr>`).join('')}</tbody></table></div>`:`<div class="empty">ยังไม่มีค่าใช้จ่าย</div>`}</details><details><summary>ประวัติราคากลาง</summary>${hist.length?`<div class="tablewrap"><table class="table"><thead><tr><th>สถาบัน</th><th>ราคา</th><th>ข้อมูล ณ</th></tr></thead><tbody>${hist.map(x=>`<tr><td>${esc(x.institution)}</td><td>${money(x.price)}</td><td>${dateTH(x.effective_date)}</td></tr>`).join('')}</tbody></table></div>`:`<div class="empty">ยังไม่มีประวัติ</div>`}</details></div></div><div class="fabrow"><button class="btn ghost" onclick="editValuation('${c.id}')">✏️ อัปเดตราคากลาง</button><button class="btn" onclick="openQuickEdit('${c.id}')">⌨️ แก้แบบสั้น</button></div>`}
-function openQuickEdit(id){const c=state.cars.find(x=>x.id===id);showModal(`<div class="sheet"><button class="close" onclick="closeModal()">×</button><h2>แก้ไขรถแบบสั้น</h2><div class="notice">${esc(c.brand)} ${esc(c.model)} • ${esc(c.plate||'-')}</div><div class="quick"><textarea id="editText" placeholder="เช่น เพิ่มค่าซ่อม 8500\nหรือ: เปลี่ยนราคาตั้งขาย 239000"></textarea></div><div class="toolbar" style="margin-top:12px"><button class="btn" onclick="applyQuickEdit('${id}')">บันทึก</button><button class="btn ghost" onclick="voiceInput('editText')">🎙️ พูด</button></div></div>`)}
-async function applyQuickEdit(id){const raw=document.getElementById('editText').value.trim();if(!raw){toast('ใส่คำสั่งก่อน');return}const exp=raw.match(/(?:เพิ่ม)?\s*ค่า?(?:ซ่อม|ยาง|สี|โอน|ภาษี|ใช้จ่าย)\s*(\d[\d,]*)/i);const asking=raw.match(/(?:ราคาตั้งขาย|ตั้งขาย)\s*(\d[\d,]*)/i);const purchase=raw.match(/(?:ราคาซื้อ(?:เข้า)?|ซื้อ(?:เข้า)?)\s*(?:เป็น|=)?\s*(\d[\d,]*)/i);const mileage=raw.match(/(?:ไมล์|เลขไมล์)\s*(?:เป็น|=)?\s*(\d[\d,]*)/i);const year=raw.match(/(?:เปลี่ยนปี|ปีรถ)\s*(?:เป็น|=)?\s*(19\d{2}|20\d{2})/i);const color=raw.match(/(?:เปลี่ยนสี|สี)\s*(?:เป็น|=)?\s*([ก-ฮ]+(?:\s*[ก-ฮ]+)*)/i);const plate=raw.match(/(?:เปลี่ยนทะเบียน|ทะเบียน)\s*(?:เป็น|=)?\s*([ก-ฮ]{1,3}\s*\d{1,4})/i);const patch={updated_by:state.me.id};if(asking)patch.asking_price=Number(asking[1].replace(/,/g,''));if(purchase)patch.purchase_price=Number(purchase[1].replace(/,/g,''));if(mileage)patch.mileage=Number(mileage[1].replace(/,/g,''));if(year)patch.year=Number(year[1]);if(color)patch.color=color[1].trim();if(plate)patch.plate=plate[1].trim();let changed=Object.keys(patch).length>1;if(changed){const r=await sb.from('cars').update(patch).eq('id',id);if(r.error){toast('แก้รถไม่สำเร็จ: '+r.error.message);return}}if(exp){const r=await sb.from('car_expenses').insert({car_id:id,expense_type:raw.match(/ซ่อม|ยาง|สี|โอน|ภาษี/)?.[0]||'อื่น ๆ',amount:Number(exp[1].replace(/,/g,'')),expense_date:today(),note:'เพิ่มผ่าน Quick Edit',created_by:state.me.id});if(r.error){toast('เพิ่มค่าใช้จ่ายไม่สำเร็จ: '+r.error.message);return}}if(!changed&&!exp){toast('ฉันยังไม่เข้าใจคำสั่งนี้');return}await audit('cars',id,'quick_update','แก้ไขรถแบบสั้น');closeModal();await load();openDetail(id);toast('อัปเดตแล้ว')}
-function addExpense(id,data={}){showModal(`<div class="sheet"><button class="close" onclick="closeModal()">×</button><h2>เพิ่มค่าใช้จ่าย</h2><form onsubmit="saveExpense(event,'${id}')"><div class="fieldgrid"><div class="field"><label>รายการ</label><input name="expense_type" placeholder="เช่น ซ่อม / ยาง / สี / โอน" value="${esc(data.expense_type||'')}"></div><div class="field"><label>จำนวนเงิน</label><input name="amount" inputmode="decimal" required value="${esc(data.amount||'')}"></div><div class="field"><label>วันที่</label><input name="expense_date" type="date" value="${esc(data.expense_date||today())}"></div><div class="field full"><label>หมายเหตุ</label><textarea name="note">${esc(data.note||'')}</textarea></div></div><div class="toolbar" style="margin-top:12px"><button class="btn">บันทึก</button><button type="button" class="btn ghost" onclick="closeModal()">ยกเลิก</button></div></form></div>`)}
-async function saveExpense(e,id){e.preventDefault();const f=new FormData(e.target);const o=Object.fromEntries(f.entries());o.car_id=id;o.amount=Number(String(o.amount).replace(/,/g,''));o.created_by=state.me.id;const {error}=await sb.from('car_expenses').insert(o);if(error)return toast(error.message);await audit('car_expenses',null,'create','เพิ่มค่าใช้จ่ายให้รถ');closeModal();await load();openDetail(id);toast('เพิ่มค่าใช้จ่ายแล้ว')}
-function editExpense(id){const x=state.expenses.find(a=>a.id===id);if(!x)return;showModal(`<div class="sheet"><button class="close" onclick="closeModal()">×</button><h2>แก้ไขค่าใช้จ่าย</h2><form onsubmit="updateExpense(event,'${id}','${x.car_id}')"><div class="fieldgrid"><div class="field"><label>รายการ</label><input name="expense_type" value="${esc(x.expense_type)}"></div><div class="field"><label>จำนวนเงิน</label><input name="amount" value="${esc(x.amount)}"></div><div class="field"><label>วันที่</label><input name="expense_date" type="date" value="${esc(x.expense_date)}"></div><div class="field full"><label>หมายเหตุ</label><textarea name="note">${esc(x.note||'')}</textarea></div></div><div class="toolbar" style="margin-top:12px"><button class="btn">บันทึก</button><button type="button" class="btn ghost" onclick="closeModal()">ยกเลิก</button></div></form></div>`)}
-async function updateExpense(e,id,carId){e.preventDefault();const f=new FormData(e.target);const o=Object.fromEntries(f.entries());o.amount=Number(String(o.amount).replace(/,/g,''));const {error}=await sb.from('car_expenses').update(o).eq('id',id);if(error)return toast(error.message);closeModal();await load();openDetail(carId);toast('แก้ไขค่าใช้จ่ายแล้ว')}
-function editValuation(id){const c=state.cars.find(x=>x.id===id);showModal(`<div class="sheet"><button class="close" onclick="closeModal()">×</button><h2>อัปเดตราคากลาง</h2><div class="notice">กรอกตัวเลขที่ตรวจจากแหล่งของ TTB/Tisco เอง ระบบจะบันทึก “วันที่ข้อมูล” และเก็บประวัติเดิมไว้</div><form onsubmit="saveValuation(event,'${id}')"><div class="fieldgrid"><div class="field"><label>TTB ราคากลาง</label><input name="ttb_price" inputmode="decimal" value="${esc(c.ttb_price??'')}"></div><div class="field"><label>TTB ข้อมูล ณ</label><input name="ttb_effective_date" type="date" value="${esc(c.ttb_effective_date||today())}"></div><div class="field"><label>Tisco ราคากลาง</label><input name="tisco_price" inputmode="decimal" value="${esc(c.tisco_price??'')}"></div><div class="field"><label>Tisco ข้อมูล ณ</label><input name="tisco_effective_date" type="date" value="${esc(c.tisco_effective_date||today())}"></div><div class="field full"><label>หมายเหตุ</label><textarea name="note"></textarea></div></div><div class="toolbar" style="margin-top:12px"><button class="btn">บันทึกและสร้างประวัติ</button><button type="button" class="btn ghost" onclick="closeModal()">ยกเลิก</button></div></form></div>`)}
-async function saveValuation(e,id){e.preventDefault();const f=new FormData(e.target);const o=Object.fromEntries(f.entries());const c=state.cars.find(x=>x.id===id);const patch={updated_by:state.me.id,ttb_price:o.ttb_price?Number(String(o.ttb_price).replace(/,/g,'')):null,ttb_effective_date:o.ttb_effective_date||null,tisco_price:o.tisco_price?Number(String(o.tisco_price).replace(/,/g,'')):null,tisco_effective_date:o.tisco_effective_date||null};const {error}=await sb.from('cars').update(patch).eq('id',id);if(error)return toast(error.message);const rows=[];if(o.ttb_price)rows.push({car_id:id,institution:'TTB',price:Number(String(o.ttb_price).replace(/,/g,'')),effective_date:o.ttb_effective_date||today(),note:o.note||null,recorded_by:state.me.id});if(o.tisco_price)rows.push({car_id:id,institution:'Tisco',price:Number(String(o.tisco_price).replace(/,/g,'')),effective_date:o.tisco_effective_date||today(),note:o.note||null,recorded_by:state.me.id});if(rows.length){const r=await sb.from('valuation_history').insert(rows);if(r.error)return toast(r.error.message)}await audit('cars',id,'valuation_update','อัปเดตราคากลาง');closeModal();await load();openDetail(id);toast('อัปเดตราคากลางแล้ว')}
-function voiceInput(targetId){const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SpeechRecognition){toast('เบราว์เซอร์นี้ยังไม่รองรับการพูดเป็นข้อความ');return}const r=new SpeechRecognition();r.lang='th-TH';r.interimResults=false;r.maxAlternatives=1;r.onresult=e=>{const t=e.results[0][0].transcript;const id=targetId||'quickText';const el=document.getElementById(id);if(el)el.value=(el.value?el.value+' ':'')+t};r.onerror=()=>toast('รับเสียงไม่สำเร็จ');r.start();toast('กำลังฟัง...')}
-function showModal(html){let m=document.createElement('div');m.id='modal';m.className='modal';m.innerHTML=html;document.body.appendChild(m)} function closeModal(){document.getElementById('modal')?.remove()}
-async function audit(entity_type,entity_id,action,summary){try{await sb.from('audit_log').insert({entity_type,entity_id,action,summary,actor:state.me.id})}catch(e){}}
-if(sb){sb.auth.onAuthStateChange(()=>setTimeout(load,0));sb.channel('stock').on('postgres_changes',{event:'*',schema:'public',table:'cars'},()=>load()).on('postgres_changes',{event:'*',schema:'public',table:'car_expenses'},()=>load()).on('postgres_changes',{event:'*',schema:'public',table:'valuation_history'},()=>load()).subscribe();load();}else renderLogin();
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+const CFG=window.APP_CONFIG||{};
+const configured=CFG.supabaseUrl&&CFG.supabaseAnonKey&&window.supabase;
+const sb=configured?window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey):null;
+let me=null, emp=null, cars=[], expenses=[], histories=[], editingId=null;
+
+const statuses=['รอตรวจสภาพ','กำลังซ่อม','เตรียมรถ','พร้อมขาย','จองแล้ว','ขายแล้ว','ยกเลิก'];
+const money=n=>(n===null||n===undefined||n==='')?'—':Number(n).toLocaleString('th-TH',{maximumFractionDigits:0});
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const today=()=>new Date().toISOString().slice(0,10);
+const fmtDate=s=>s?new Date(s+'T00:00:00').toLocaleDateString('th-TH',{day:'2-digit',month:'2-digit',year:'numeric'}):'ยังไม่ระบุ';
+const nDate=v=>v?String(v):null;
+function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');clearTimeout(window.__t);window.__t=setTimeout(()=>e.classList.remove('show'),1900)}
+function age(d){if(!d)return '-';return Math.max(0,Math.floor((Date.now()-new Date(d+'T00:00:00'))/86400000))}
+function totalExp(id){return expenses.filter(x=>x.car_id===id).reduce((a,x)=>a+Number(x.amount||0),0)}
+function currentCost(c){return Number(c.purchase_price||0)+totalExp(c.id)}
+function byId(id){return cars.find(c=>c.id===id)}
+
+function renderLogin(msg=''){
+ document.getElementById('app').innerHTML=`<div class="login"><div class="loginBox">
+ <h1>น้ำมนต์ 99 Stock</h1><p>ระบบสต๊อกรถสำหรับทีมงานภายใน</p>
+ ${msg?`<div class="notice error">${esc(msg)}</div>`:''}
+ ${!configured?`<div class="notice error">ยังไม่ได้เชื่อม Supabase กรุณาตรวจสอบ <b>config.js</b></div>`:''}
+ <div class="field"><label>อีเมล</label><input id="email" type="email" autocomplete="username"></div>
+ <div class="field" style="margin-top:10px"><label>รหัสผ่าน</label><input id="pass" type="password" autocomplete="current-password"></div>
+ <button class="btn primary" style="width:100%;margin-top:13px" onclick="login()">เข้าสู่ระบบ</button>
+ </div></div>`;
+}
+async function login(){
+ if(!sb){toast('ยังไม่ได้เชื่อม Supabase');return}
+ const {error}=await sb.auth.signInWithPassword({email:document.getElementById('email').value.trim(),password:document.getElementById('pass').value});
+ if(error){renderLogin(error.message);return}
+ await boot();
+}
+async function boot(){
+ if(!sb){renderLogin();return}
+ const {data:u}=await sb.auth.getUser(); me=u?.user||null;
+ if(!me){renderLogin();return}
+ const {data:e,error:ee}=await sb.from('employees').select('*').eq('user_id',me.id).maybeSingle();
+ if(ee||!e?.active){await sb.auth.signOut();renderLogin('บัญชีนี้ยังไม่ได้รับสิทธิ์เข้าใช้งาน');return}
+ emp=e;
+ await reload();
+}
+async function reload(){
+ const [{data:c,error:ce},{data:x,error:xe},{data:h,error:he}]=await Promise.all([
+  sb.from('cars').select('*').order('updated_at',{ascending:false}),
+  sb.from('car_expenses').select('*').order('expense_date',{ascending:false}),
+  sb.from('valuation_history').select('*').order('effective_date',{ascending:false})
+ ]);
+ if(ce||xe||he){toast('โหลดข้อมูลไม่สำเร็จ');console.error(ce||xe||he);return}
+ cars=c||[];expenses=x||[];histories=h||[];
+ renderHome();
+}
+function renderHome(){
+ const active=cars.filter(c=>!['ขายแล้ว','ยกเลิก'].includes(c.status));
+ const ready=active.filter(c=>c.status==='พร้อมขาย');
+ const list=active.slice(0,30);
+ document.getElementById('app').innerHTML=`<div class="container">
+ <div class="topbar"><div><div class="title">น้ำมนต์ 99 STOCK</div><div class="subtitle">${esc(emp?.display_name||me?.email||'')}</div></div><button class="btn small" onclick="logout()">ออก</button></div>
+ <div class="search"><input id="search" placeholder="ค้นหาทะเบียน / รุ่น / ยี่ห้อ / สี / VIN" oninput="drawHome()"></div>
+ <div class="grid" style="margin-bottom:10px">
+   <div class="moneyCard"><div class="moneyLabel">รถในสต๊อก</div><div class="moneyValue">${active.length}</div><div class="moneySub">พร้อมขาย ${ready.length} คัน</div></div>
+   <div class="moneyCard"><div class="moneyLabel">ต้นทุนที่บันทึก</div><div class="moneyValue">${money(active.reduce((s,c)=>s+currentCost(c),0))}</div><div class="moneySub">เฉพาะรถที่ยังไม่ขาย</div></div>
+ </div>
+ <div class="section"><div class="sectionTitle"><strong>รถล่าสุด</strong><span class="sectionHint">แตะเพื่อเปิดรายละเอียด</span></div><div id="homeList"></div></div>
+ </div>
+ <div class="bottomBar"><div class="bottomInner"><button class="btn ghost" onclick="openQuick()">⌨️ เพิ่มแบบสั้น</button><button class="btn ghost" onclick="voiceInput()">🎙️ พูด</button><button class="btn primary" onclick="openEditor()">＋ เพิ่มรถ</button></div></div>`;
+ drawHome();
+}
+function drawHome(){
+ const q=(document.getElementById('search')?.value||'').trim().toLowerCase();
+ const arr=cars.filter(c=>!['ขายแล้ว','ยกเลิก'].includes(c.status)).filter(c=>!q||[c.brand,c.model,c.trim,c.plate,c.color,c.vin,String(c.year||'')].join(' ').toLowerCase().includes(q)).slice(0,40);
+ const el=document.getElementById('homeList'); if(!el)return;
+ el.innerHTML=arr.length?arr.map(c=>`<button class="listCard" style="width:100%;text-align:left" onclick="openDetail('${c.id}')"><div class="listMain"><div class="listName">${esc(c.brand)} ${esc(c.model)}${c.trim?' '+esc(c.trim):''}</div><div class="listMeta">${esc(c.plate||'ไม่มีทะเบียน')} • ${esc(c.year||'-')} • ${esc(c.color||'-')}</div></div><div class="listSide"><div class="statusPill">${esc(c.status)}</div><div class="listPrice">ซื้อ ${money(c.purchase_price)}</div><div class="listMeta">${age(c.purchase_date)} วัน</div></div></button>`).join(''):'<div class="empty">ไม่พบรถ</div>';
+}
+function closeEditor(){document.getElementById('editor')?.remove()}
+function openEditor(car={}){editingId=car.id||null; showEditor(car)}
+function openDetail(id){
+ const c=byId(id); if(!c)return;
+ editingId=id;
+ const ex=expenses.filter(x=>x.car_id===id), hist=histories.filter(x=>x.car_id===id);
+ document.getElementById('app').innerHTML=`<div class="container">
+ <div class="topbar"><button class="btn small" onclick="renderHome()">← กลับ</button><div class="toolbar"><button class="btn small" onclick="showEditor(byId('${id}'))">✏️ แก้ไข</button><button class="btn small" onclick="openQuickEdit('${id}')">⌨️ Quick</button></div></div>
+ <div class="editorHead"><div class="carTitle">${esc(c.brand)} ${esc(c.model)}${c.trim?' '+esc(c.trim):''}</div><div class="carMeta">${esc(c.plate||'ไม่มีทะเบียน')} • ${esc(c.year||'-')} • ${esc(c.color||'-')}</div><div class="statusPill">${esc(c.status)}</div></div>
+ <div class="grid">
+   <div class="moneyCard"><div class="moneyLabel">ราคาซื้อเข้า</div><div class="moneyValue">${money(c.purchase_price)}</div><div class="moneySub">${fmtDate(c.purchase_date)}</div></div>
+   <div class="moneyCard"><div class="moneyLabel">ค่าใช้จ่ายสะสม</div><div class="moneyValue">${money(totalExp(id))}</div><div class="moneySub">${ex.length} รายการ</div></div>
+   <div class="moneyCard"><div class="moneyLabel">ต้นทุนที่บันทึก</div><div class="moneyValue">${money(currentCost(c))}</div><div class="moneySub">ซื้อเข้า + ค่าใช้จ่าย</div></div>
+   <div class="moneyCard"><div class="moneyLabel">ราคาตั้งขาย</div><div class="moneyValue">${money(c.asking_price)}</div><div class="moneySub">อายุสต๊อก ${age(c.purchase_date)} วัน</div></div>
+ </div>
+ <div class="accordion" style="margin-top:10px">
+   <details open><summary>ข้อมูลรถ</summary><div class="detailBody"><div class="grid" style="margin-top:5px">
+    <div><b>ยี่ห้อ / รุ่น</b><br>${esc(c.brand)} ${esc(c.model)} ${esc(c.trim||'')}</div><div><b>ทะเบียน</b><br>${esc(c.plate||'-')}</div>
+    <div><b>เลขตัวถัง</b><br>${esc(c.vin||'-')}</div><div><b>เลขไมล์</b><br>${c.mileage?money(c.mileage):'-'}</div>
+    <div><b>วันที่ซื้อเข้า</b><br>${fmtDate(c.purchase_date)}</div><div><b>สถานะ</b><br>${esc(c.status)}</div>
+   </div></div></details>
+   <details><summary>ราคากลาง TTB / Tisco</summary><div class="detailBody"><div class="moneyRow">
+      <div class="moneyCard"><div class="moneyLabel">TTB</div><div class="moneyValue">${money(c.ttb_price)}</div><div class="moneySub">ข้อมูล ณ ${fmtDate(c.ttb_effective_date)}</div></div>
+      <div class="moneyCard"><div class="moneyLabel">Tisco</div><div class="moneyValue">${money(c.tisco_price)}</div><div class="moneySub">ข้อมูล ณ ${fmtDate(c.tisco_effective_date)}</div></div>
+   </div></div></details>
+   <details><summary>ค่าใช้จ่าย</summary><div class="detailBody">${ex.length?ex.map(x=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)"><div><b>${esc(x.expense_type)}</b><div class="muted">${fmtDate(x.expense_date)}${x.note?' • '+esc(x.note):''}</div></div><div style="font-weight:850">${money(x.amount)}</div></div>`).join(''):'<div class="empty">ยังไม่มีค่าใช้จ่าย</div>'}<button class="btn small" style="margin-top:10px" onclick="addExpense('${id}')">＋ เพิ่มค่าใช้จ่าย</button></div></details>
+   <details><summary>ประวัติราคากลาง</summary><div class="detailBody">${hist.length?hist.map(x=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)"><span>${esc(x.institution)} • ${fmtDate(x.effective_date)}</span><b>${money(x.price)}</b></div>`).join(''):'<div class="empty">ยังไม่มีประวัติ</div>'}</div></details>
+   <details><summary>หมายเหตุ</summary><div class="detailBody"><div class="notice">${esc(c.notes||'ไม่มี')}</div></div></details>
+ </div>
+ </div>
+ <div class="bottomBar"><div class="bottomInner"><button class="btn ghost" onclick="editValuation('${id}')">✏️ ราคากลาง</button><button class="btn primary" onclick="showEditor(byId('${id}'))">แก้ไขข้อมูลรถ</button></div></div>`;
+}
+function showEditor(c={}){
+ document.getElementById('editor')?.remove();
+ const m=document.createElement('div');m.id='editor';m.className='modal';m.innerHTML=`<div class="sheet" style="width:100%;max-width:860px;max-height:94vh;overflow:auto;background:var(--bg);padding:0">
+   <div style="position:sticky;top:0;z-index:2;background:rgba(245,245,242,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
+     <div><b>${c.id?'แก้ไขข้อมูลรถ':'เพิ่มรถ'}</b><div class="subtitle">${c.id?esc(c.brand+' '+c.model):'กรอกเฉพาะข้อมูลที่มี ระบบไม่บังคับทุกช่อง'}</div></div>
+     <button class="btn small" onclick="closeEditor()">×</button>
+   </div>
+   <div class="container" style="padding-top:12px">
+     <div class="editorLayout">
+       <div>
+         <div class="section"><div class="sectionTitle"><strong>ข้อมูลหลัก</strong><span class="sectionHint">จำเป็น: ยี่ห้อ + รุ่น</span></div><div class="grid">
+           <div class="field"><label>ยี่ห้อ *</label><input id="f_brand" value="${esc(c.brand||'')}"></div>
+           <div class="field"><label>รุ่น *</label><input id="f_model" value="${esc(c.model||'')}"></div>
+           <div class="field"><label>รุ่นย่อย</label><input id="f_trim" value="${esc(c.trim||'')}"></div>
+           <div class="field"><label>ปี</label><input id="f_year" inputmode="numeric" placeholder="เช่น 2022" value="${esc(c.year||'')}"></div>
+           <div class="field"><label>ทะเบียน</label><input id="f_plate" value="${esc(c.plate||'')}"></div>
+           <div class="field"><label>สี</label><input id="f_color" value="${esc(c.color||'')}"></div>
+           <div class="field"><label>เลขตัวถัง (VIN)</label><input id="f_vin" value="${esc(c.vin||'')}"></div>
+           <div class="field"><label>เลขไมล์</label><input id="f_mileage" inputmode="numeric" value="${esc(c.mileage||'')}"></div>
+         </div></div>
+         <div class="section"><div class="sectionTitle"><strong>การซื้อเข้า</strong><span class="sectionHint">ต้นทุนเริ่มต้น</span></div><div class="grid">
+           <div class="field"><label>วันที่ซื้อเข้า</label><input id="f_purchase_date" type="date" value="${esc(c.purchase_date||'')}"></div>
+           <div class="field"><label>ราคาซื้อเข้า</label><input id="f_purchase_price" inputmode="decimal" value="${esc(c.purchase_price??'')}"></div>
+         </div></div>
+         <div class="section"><div class="sectionTitle"><strong>ราคากลาง</strong><span class="sectionHint">กรอกเอง + วันที่ข้อมูล</span></div><div class="moneyRow">
+           <div class="moneyCard"><div class="moneyLabel">TTB</div><div class="field" style="margin-top:6px"><input id="f_ttb" inputmode="decimal" placeholder="เช่น 420000" value="${esc(c.ttb_price??'')}"></div><div class="field" style="margin-top:7px"><label>ข้อมูล ณ วันที่</label><input id="f_ttb_date" type="date" value="${esc(c.ttb_effective_date||'')}"></div></div>
+           <div class="moneyCard"><div class="moneyLabel">Tisco</div><div class="field" style="margin-top:6px"><input id="f_tisco" inputmode="decimal" placeholder="เช่น 415000" value="${esc(c.tisco_price??'')}"></div><div class="field" style="margin-top:7px"><label>ข้อมูล ณ วันที่</label><input id="f_tisco_date" type="date" value="${esc(c.tisco_effective_date||'')}"></div></div>
+         </div></div>
+       </div>
+       <div>
+         <div class="section"><div class="sectionTitle"><strong>การขาย</strong></div><div class="grid">
+           <div class="field"><label>ราคาตั้งขาย</label><input id="f_asking" inputmode="decimal" value="${esc(c.asking_price??'')}"></div>
+           <div class="field"><label>สถานะ</label><select id="f_status">${statuses.map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+         </div></div>
+         <div class="section"><div class="sectionTitle"><strong>เพิ่มเติม</strong></div><div class="field"><label>หมายเหตุ</label><textarea id="f_notes" rows="5" placeholder="เช่น รอเปลี่ยนยาง / เอกสารอยู่กับไฟแนนซ์">${esc(c.notes||'')}</textarea></div></div>
+         <div class="section"><div class="notice">ช่องวันที่ที่เว้นว่างจะถูกบันทึกเป็น “ไม่มีข้อมูล” และจะไม่เกิด error จากค่า date ว่าง</div><div class="costSummary"><span>ต้นทุนจากข้อมูลที่บันทึก</span><b>${money(Number(c.purchase_price||0)+totalExp(c.id||''))}</b></div></div>
+       </div>
+     </div>
+   </div>
+   <div class="bottomBar"><div class="bottomInner"><button class="btn" onclick="closeEditor()">ยกเลิก</button><button class="btn primary" onclick="saveEditor()">บันทึกข้อมูล</button></div></div>
+ </div>`;document.body.appendChild(m);
+}
+function num(id){const v=document.getElementById(id)?.value?.trim();if(v==='')return null;const n=Number(v.replace(/,/g,''));return Number.isFinite(n)?n:null}
+async function saveEditor(){
+ const brand=document.getElementById('f_brand').value.trim(),model=document.getElementById('f_model').value.trim();
+ if(!brand||!model){toast('กรุณากรอกยี่ห้อและรุ่น');return}
+ const id=editingId; const row={
+  brand,model,trim:document.getElementById('f_trim').value.trim()||null,
+  year:num('f_year'),plate:document.getElementById('f_plate').value.trim()||null,color:document.getElementById('f_color').value.trim()||null,
+  vin:document.getElementById('f_vin').value.trim()||null,mileage:num('f_mileage'),
+  purchase_date:nDate(document.getElementById('f_purchase_date').value),purchase_price:num('f_purchase_price')??0,
+  ttb_price:num('f_ttb'),ttb_effective_date:nDate(document.getElementById('f_ttb_date').value),
+  tisco_price:num('f_tisco'),tisco_effective_date:nDate(document.getElementById('f_tisco_date').value),
+  asking_price:num('f_asking'),status:document.getElementById('f_status').value,notes:document.getElementById('f_notes').value.trim()||null,updated_by:me.id
+ };
+ let r=id?await sb.from('cars').update(row).eq('id',id).select().single():await sb.from('cars').insert({...row,created_by:me.id}).select().single();
+ if(r.error){toast(r.error.message);console.error(r.error);return}
+ await audit(r.data.id,id?'update':'create',id?'แก้ไขข้อมูลรถ':'เพิ่มรถ');
+ closeEditor();await reload();openDetail(r.data.id);
+ toast(id?'อัปเดตรถแล้ว':'เพิ่มรถแล้ว');
+}
+async function audit(entity_id,action,summary){
+ try{await sb.from('audit_log').insert({entity_type:'cars',entity_id,action,summary,actor:me.id})}catch(e){}
+}
+function openQuick(){showQuick('quickText','เพิ่มรถแบบสั้น')}
+function openQuickEdit(id){showQuick('editText','แก้ไขรถแบบสั้น',id)}
+function showQuick(id,title,carId=null){
+ const c=carId?byId(carId):null;
+ showModal(`<div class="sheet"><button class="btn small" style="float:right" onclick="closeModal()">×</button><h2 style="margin-top:2px">${title}</h2>
+ ${c?`<div class="notice">${esc(c.brand)} ${esc(c.model)} • ${esc(c.plate||'-')}</div>`:''}
+ <div class="quick" style="border:1px solid var(--line);border-radius:14px;background:#fff;padding:2px 10px"><textarea id="${id}" rows="4" placeholder="${carId?'เช่น ราคาซื้อเข้า 180000\\nหรือ: เปลี่ยนสีดำ / ทะเบียน กข1234 / เพิ่มค่าซ่อม 8500':'เช่น City V 2013 ขาว กข1234 ซื้อ185000'}"></textarea></div>
+ <div class="toolbar" style="margin-top:10px"><button class="btn primary" onclick="${carId?`applyQuickEdit('${carId}','${id}')`:`parseQuick('${id}')`}">วิเคราะห์และทำต่อ</button><button class="btn" onclick="voiceInput('${id}')">🎙️ พูด</button></div>
+ <div id="${id}Result" style="margin-top:10px"></div></div>`)
+}
+function showModal(inner){closeModal();const m=document.createElement('div');m.id='modal';m.className='modal';m.innerHTML=inner;document.body.appendChild(m)}
+function closeModal(){document.getElementById('modal')?.remove()}
+function parseQuick(id){
+ const raw=document.getElementById(id).value.trim();if(!raw){toast('กรอกข้อความก่อน');return}
+ const plate=(raw.match(/([ก-ฮ]{1,3}\\s*\\d{1,4})/)||[])[1]||'';
+ const existing=plate?cars.find(c=>c.plate?.replace(/\\s/g,'')===plate.replace(/\\s/g,'')):null;
+ const price=(raw.match(/(?:ซื้อ(?:เข้า)?|ทุน)\\s*([\\d,]+)/i)||[])[1];
+ const year=(raw.match(/(?:19|20)\\d{2}/)||[])[0];
+ const colors=['ขาว','ดำ','แดง','เทา','เงิน','น้ำเงิน','ฟ้า','เขียว','ครีม','บรอนซ์']; const color=colors.find(x=>raw.includes(x))||'';
+ const models=['Yaris','City','March','D-Max','Ranger','CX-5','Civic','Jazz','Fortuner','Hilux','Vios','Almera','Navara'];
+ const model=models.find(x=>raw.toLowerCase().includes(x.toLowerCase()))||'';
+ let brand=['Toyota','Honda','Nissan','Isuzu','Ford','Mazda','Mitsubishi','Suzuki','MG','BYD','GWM','BMW','Mercedes','Hyundai','Kia'].find(x=>raw.toLowerCase().includes(x.toLowerCase()))||'';
+ const out=document.getElementById(id+'Result');
+ if(existing){out.innerHTML=`<div class="notice">พบรถเดิม <b>${esc(existing.brand)} ${esc(existing.model)}</b> ทะเบียน <b>${esc(existing.plate||'')}</b><br>ระบบจะไม่สร้างรถใหม่ คุณสามารถเปิดแก้ไขข้อมูลคันเดิมได้</div><button class="btn primary" onclick="closeModal();showEditor(byId('${existing.id}'))">เปิดแก้ไขรถคันนี้</button>`}
+ else{out.innerHTML=`<div class="notice">ข้อมูลที่ตรวจพบ: <b>${esc(brand||'')}</b> <b>${esc(model||'')}</b> ${year||''} ${color||''} ${plate||''} ${price?'ซื้อ '+money(Number(price.replace(/,/g,'')))+' บาท':''}</div><button class="btn primary" onclick='closeModal();openEditor(${JSON.stringify({brand,model,year:year||'',plate:plate||'',color,purchase_price:price?Number(price.replace(/,/g,'')):null,status:"รอตรวจสภาพ"}).replace(/</g,"\\\\u003c")})'>เปิดฟอร์มตรวจสอบ</button>`}
+}
+async function applyQuickEdit(carId,id){
+ const raw=document.getElementById(id).value.trim();if(!raw){toast('กรอกข้อความก่อน');return}
+ const car=byId(carId);const patch={updated_by:me.id};let changed=false;
+ const price=raw.match(/ราคาซื้อเข้า\\s*([\\d,]+)/i); if(price){patch.purchase_price=Number(price[1].replace(/,/g,''));changed=true}
+ const asking=raw.match(/(?:ราคาตั้งขาย|ตั้งขาย)\\s*([\\d,]+)/i);if(asking){patch.asking_price=Number(asking[1].replace(/,/g,''));changed=true}
+ const color=['ขาว','ดำ','แดง','เทา','เงิน','น้ำเงิน','ฟ้า','เขียว','ครีม','บรอนซ์'].find(x=>raw.includes(x));if(color){patch.color=color;changed=true}
+ const reg=raw.match(/ทะเบียน\\s*([ก-ฮ]{1,3}\\s*\\d{1,4})/i);if(reg){patch.plate=reg[1];changed=true}
+ const year=raw.match(/(?:ปี\\s*)?(19\\d{2}|20\\d{2})/i);if(year){patch.year=Number(year[1]);changed=true}
+ const exp=raw.match(/เพิ่ม(?:ค่าซ่อม|ค่าใช้จ่าย)?\\s*([\\d,]+)/i);
+ if(exp){const e=await sb.from('car_expenses').insert({car_id:carId,expense_type:'อื่น ๆ',amount:Number(exp[1].replace(/,/g,'')),expense_date:today(),note:'เพิ่มผ่าน Quick Edit',created_by:me.id});if(e.error){toast(e.error.message);return}changed=true}
+ if(!changed){toast('ยังอ่านคำสั่งนี้ไม่ได้');return}
+ const {error}=await sb.from('cars').update(patch).eq('id',carId);if(error){toast(error.message);return}
+ await audit(carId,'quick_update','แก้ไขรถแบบสั้น');closeModal();await reload();openDetail(carId);toast('อัปเดตแล้ว');
+}
+function addExpense(id){
+ showModal(`<div class="sheet"><button class="btn small" style="float:right" onclick="closeModal()">×</button><h2>เพิ่มค่าใช้จ่าย</h2><form onsubmit="saveExpense(event,'${id}')"><div class="grid">
+ <div class="field"><label>รายการ</label><input name="type" placeholder="เช่น ซ่อม / ยาง / สี / โอน"></div>
+ <div class="field"><label>จำนวนเงิน *</label><input name="amount" inputmode="decimal" required></div>
+ <div class="field"><label>วันที่</label><input name="date" type="date" value="${today()}"></div>
+ <div class="field full"><label>หมายเหตุ</label><textarea name="note" rows="3"></textarea></div>
+ </div><div class="toolbar" style="margin-top:12px"><button class="btn primary">บันทึก</button><button type="button" class="btn" onclick="closeModal()">ยกเลิก</button></div></form></div>`)
+}
+async function saveExpense(e,id){e.preventDefault();const f=new FormData(e.target);const amount=Number(String(f.get('amount')).replace(/,/g,''));if(!Number.isFinite(amount)){toast('จำนวนเงินไม่ถูกต้อง');return}
+ const {error}=await sb.from('car_expenses').insert({car_id:id,expense_type:String(f.get('type')||'อื่น ๆ'),amount,expense_date:String(f.get('date')||today())||today(),note:String(f.get('note')||'').trim()||null,created_by:me.id});
+ if(error){toast(error.message);return}await audit(id,'expense_create','เพิ่มค่าใช้จ่าย');closeModal();await reload();openDetail(id);toast('เพิ่มค่าใช้จ่ายแล้ว')}
+function editValuation(id){
+ const c=byId(id);showModal(`<div class="sheet"><button class="btn small" style="float:right" onclick="closeModal()">×</button><h2>อัปเดตราคากลาง</h2><div class="notice">กรอกผลที่ตรวจมาเอง ระบบจะเก็บวันที่ข้อมูลและประวัติเดิม</div><form onsubmit="saveValuation(event,'${id}')"><div class="moneyRow">
+ <div class="moneyCard"><div class="moneyLabel">TTB</div><div class="field" style="margin-top:6px"><input name="ttb" inputmode="decimal" value="${esc(c.ttb_price??'')}"></div><div class="field" style="margin-top:7px"><label>ข้อมูล ณ วันที่</label><input name="ttbDate" type="date" value="${esc(c.ttb_effective_date||today())}"></div></div>
+ <div class="moneyCard"><div class="moneyLabel">Tisco</div><div class="field" style="margin-top:6px"><input name="tisco" inputmode="decimal" value="${esc(c.tisco_price??'')}"></div><div class="field" style="margin-top:7px"><label>ข้อมูล ณ วันที่</label><input name="tiscoDate" type="date" value="${esc(c.tisco_effective_date||today())}"></div></div>
+ </div><div class="toolbar" style="margin-top:12px"><button class="btn primary">บันทึก</button><button type="button" class="btn" onclick="closeModal()">ยกเลิก</button></div></form></div>`)}
+async function saveValuation(e,id){e.preventDefault();const f=new FormData(e.target);const t=f.get('ttb'),td=f.get('ttbDate'),x=f.get('tisco'),xd=f.get('tiscoDate');
+ const patch={updated_by:me.id,ttb_price:t?Number(String(t).replace(/,/g,'')):null,ttb_effective_date:nDate(td),tisco_price:x?Number(String(x).replace(/,/g,'')):null,tisco_effective_date:nDate(xd)};
+ const {error}=await sb.from('cars').update(patch).eq('id',id);if(error){toast(error.message);return}
+ const rows=[];if(t)rows.push({car_id:id,institution:'TTB',price:Number(String(t).replace(/,/g,'')),effective_date:nDate(td)||today(),recorded_by:me.id});if(x)rows.push({car_id:id,institution:'Tisco',price:Number(String(x).replace(/,/g,'')),effective_date:nDate(xd)||today(),recorded_by:me.id});
+ if(rows.length){const r=await sb.from('valuation_history').insert(rows);if(r.error){toast(r.error.message);return}}
+ await audit(id,'valuation_update','อัปเดตราคากลาง');closeModal();await reload();openDetail(id);toast('อัปเดตราคากลางแล้ว')}
+function voiceInput(targetId){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast('เบราว์เซอร์นี้ไม่รองรับเสียง');return}const r=new SR();r.lang='th-TH';r.interimResults=false;r.maxAlternatives=1;r.onresult=e=>{const id=targetId||'quickText';const el=document.getElementById(id);if(el)el.value+=(el.value?' ':'')+e.results[0][0].transcript};r.onerror=()=>toast('รับเสียงไม่สำเร็จ');r.start();toast('กำลังฟัง...')}
+async function logout(){if(sb)await sb.auth.signOut();me=null;emp=null;renderLogin()}
+if(sb){sb.auth.onAuthStateChange(()=>setTimeout(boot,0));boot()}else renderLogin();
 </script>
 </body>
 </html>
