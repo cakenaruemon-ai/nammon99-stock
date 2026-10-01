@@ -130,7 +130,7 @@ const today=()=>new Date().toISOString().slice(0,10);
 const fmtDate=s=>{const d=nDate(s);return d?new Date(d+'T00:00:00').toLocaleDateString('th-TH',{day:'2-digit',month:'2-digit',year:'numeric'}):'ยังไม่ระบุ'};
 const nDate=v=>{const s=String(v??'').trim(); if(!s) return null; const m=s.match(/^(\d{4}-\d{2}-\d{2})/); return m?m[1]:null};
 function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');clearTimeout(window.__t);window.__t=setTimeout(()=>e.classList.remove('show'),1900)}
-function age(d){if(!d)return '-';return Math.max(0,Math.floor((Date.now()-new Date(d+'T00:00:00'))/86400000))}
+function age(v){const d=nDate(v);if(!d)return '-';return Math.max(0,Math.floor((Date.now()-new Date(d+'T00:00:00'))/86400000))}
 function totalExp(id){return expenses.filter(x=>x.car_id===id).reduce((a,x)=>a+Number(x.amount||0),0)}
 function currentCost(c){return Number(c.purchase_price||0)+totalExp(c.id)}
 function byId(id){return cars.find(c=>c.id===id)}
@@ -141,7 +141,7 @@ function renderLogin(msg=''){
  ${msg?`<div class="notice error">${esc(msg)}</div>`:''}
  ${!configured?`<div class="notice error">ยังไม่ได้เชื่อม Supabase กรุณาตรวจสอบ <b>config.js</b></div>`:''}
  <div class="field"><label>อีเมล</label><input id="email" type="email" autocomplete="username"></div>
- <div class="field" style="margin-top:10px"><label>รหัสผ่าน</label><input id="pass" type="password" autocomplete="current-password"></div>
+ <div class="field" style="margin-top:10px"><label>รหัสผ่าน</label><input id="pass" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"></div>
  <button class="btn primary" style="width:100%;margin-top:13px" onclick="login()">เข้าสู่ระบบ</button>
  </div></div>`;
 }
@@ -156,7 +156,7 @@ async function boot(){
  const {data:u}=await sb.auth.getUser(); me=u?.user||null;
  if(!me){renderLogin();return}
  const {data:e,error:ee}=await sb.from('employees').select('*').eq('user_id',me.id).maybeSingle();
- if(ee||!e?.active){await sb.auth.signOut();renderLogin('บัญชีนี้ยังไม่ได้รับสิทธิ์เข้าใช้งาน');return}
+ if(ee||!e?.active){me=null;await sb.auth.signOut();renderLogin('บัญชีนี้ยังไม่ได้รับสิทธิ์เข้าใช้งาน');return}
  emp=e;
  await reload();
 }
@@ -183,7 +183,7 @@ function renderHome(){
  </div>
  <div class="section"><div class="sectionTitle"><strong>รถล่าสุด</strong><span class="sectionHint">แตะเพื่อเปิดรายละเอียด</span></div><div id="homeList"></div></div>
  </div>
- <div class="bottomBar"><div class="bottomInner"><button class="btn ghost" onclick="openQuick()">⌨️ เพิ่มแบบสั้น</button><button class="btn ghost" onclick="voiceInput()">🎙️ พูด</button><button class="btn primary" onclick="openEditor()">＋ เพิ่มรถ</button></div></div>`;
+ <div class="bottomBar"><div class="bottomInner"><button class="btn ghost" onclick="openQuick()">⌨️ เพิ่มแบบสั้น</button><button class="btn ghost" onclick="openQuick();voiceInput('quickText')">🎙️ พูด</button><button class="btn primary" onclick="openEditor()">＋ เพิ่มรถ</button></div></div>`;
  drawHome();
 }
 function drawHome(){
@@ -225,9 +225,10 @@ function openDetail(id){
  <div class="bottomBar"><div class="bottomInner"><button class="btn ghost" onclick="editValuation('${id}')">✏️ ราคากลาง</button><button class="btn primary" onclick="showEditor(byId('${id}'))">แก้ไขข้อมูลรถ</button></div></div>`;
 }
 function showEditor(c={}){
+ c=c||{}; editingId=c.id||null;
  document.getElementById('editor')?.remove();
  const m=document.createElement('div');m.id='editor';m.className='modal';m.innerHTML=`<div class="sheet" style="width:100%;max-width:860px;max-height:94vh;overflow:auto;background:var(--bg);padding:0">
-   <div style="position:sticky;top:0;z-index:5;background:rgba(247,247,244,.94);backdrop-filter:blur(14px);padding:4px 2px 12px;display:flex;align-items:center;justify-content:space-between">
+   <div style="position:sticky;top:0;z-index:5;background:rgba(247,247,244,.94);backdrop-filter:blur(14px);padding:14px 16px 12px;display:flex;align-items:center;justify-content:space-between">
      <div><div class="subtitle">น้ำมนต์ 99 STOCK</div><b style="font-size:18px">${c.id?'แก้ไขข้อมูลรถ':'เพิ่มรถเข้าสต๊อก'}</b></div>
      <button class="btn small" onclick="closeEditor()">ปิด</button>
    </div>
@@ -250,12 +251,12 @@ function showEditor(c={}){
            <div class="field"><label>เลขไมล์</label><input id="f_mileage" inputmode="numeric" value="${esc(c.mileage||'')}"></div>
          </div></div>
          <div class="section"><div class="sectionTitle"><strong>การซื้อเข้า</strong><span class="sectionHint">ต้นทุนเริ่มต้น</span></div><div class="grid">
-           <div class="field"><label>วันที่ซื้อเข้า</label><input id="f_purchase_date" type="date" value="${esc(c.purchase_date||'')}"></div>
+           <div class="field"><label>วันที่ซื้อเข้า</label><input id="f_purchase_date" type="date" value="${nDate(c.purchase_date)||''}"></div>
            <div class="field"><label>ราคาซื้อเข้า</label><input id="f_purchase_price" inputmode="decimal" value="${esc(c.purchase_price??'')}"></div>
          </div></div>
          <div class="section"><div class="sectionTitle"><strong>ราคากลาง</strong><span class="sectionHint">กรอกเอง + วันที่ข้อมูล</span></div><div class="moneyRow">
-           <div class="moneyCard"><div class="moneyLabel">TTB</div><div class="field" style="margin-top:6px"><input id="f_ttb" inputmode="decimal" placeholder="เช่น 420000" value="${esc(c.ttb_price??'')}"></div><div class="field" style="margin-top:7px"><label>ข้อมูล ณ วันที่</label><input id="f_ttb_date" type="date" value="${esc(c.ttb_effective_date||'')}"></div></div>
-           <div class="moneyCard"><div class="moneyLabel">Tisco</div><div class="field" style="margin-top:6px"><input id="f_tisco" inputmode="decimal" placeholder="เช่น 415000" value="${esc(c.tisco_price??'')}"></div><div class="field" style="margin-top:7px"><label>ข้อมูล ณ วันที่</label><input id="f_tisco_date" type="date" value="${esc(c.tisco_effective_date||'')}"></div></div>
+           <div class="moneyCard"><div class="moneyLabel">TTB</div><div class="field" style="margin-top:6px"><input id="f_ttb" inputmode="decimal" placeholder="เช่น 420000" value="${esc(c.ttb_price??'')}"></div><div class="field" style="margin-top:7px"><label>ข้อมูล ณ วันที่</label><input id="f_ttb_date" type="date" value="${nDate(c.ttb_effective_date)||''}"></div></div>
+           <div class="moneyCard"><div class="moneyLabel">Tisco</div><div class="field" style="margin-top:6px"><input id="f_tisco" inputmode="decimal" placeholder="เช่น 415000" value="${esc(c.tisco_price??'')}"></div><div class="field" style="margin-top:7px"><label>ข้อมูล ณ วันที่</label><input id="f_tisco_date" type="date" value="${nDate(c.tisco_effective_date)||''}"></div></div>
          </div></div>
        </div>
        <div>
@@ -300,7 +301,7 @@ function showQuick(id,title,carId=null){
  const c=carId?byId(carId):null;
  showModal(`<div class="sheet"><button class="btn small" style="float:right" onclick="closeModal()">×</button><h2 style="margin-top:2px">${title}</h2>
  ${c?`<div class="notice">${esc(c.brand)} ${esc(c.model)} • ${esc(c.plate||'-')}</div>`:''}
- <div class="quick" style="border:1px solid var(--line);border-radius:14px;background:#fff;padding:2px 10px"><textarea id="${id}" rows="4" placeholder="${carId?'เช่น ราคาซื้อเข้า 180000\\nหรือ: เปลี่ยนสีดำ / ทะเบียน กข1234 / เพิ่มค่าซ่อม 8500':'เช่น City V 2013 ขาว กข1234 ซื้อ185000'}"></textarea></div>
+ <div class="quick" style="border:1px solid var(--line);border-radius:14px;background:#fff;padding:2px 10px"><textarea id="${id}" rows="4" placeholder="${carId?'เช่น ราคาซื้อเข้า 180000&#10;หรือ: เปลี่ยนสีดำ / ทะเบียน กข1234 / เพิ่มค่าซ่อม 8500':'เช่น City V 2013 ขาว กข1234 ซื้อ185000'}"></textarea></div>
  <div class="toolbar" style="margin-top:10px"><button class="btn primary" onclick="${carId?`applyQuickEdit('${carId}','${id}')`:`parseQuick('${id}')`}">วิเคราะห์และทำต่อ</button><button class="btn" onclick="voiceInput('${id}')">🎙️ พูด</button></div>
  <div id="${id}Result" style="margin-top:10px"></div></div>`)
 }
@@ -308,27 +309,27 @@ function showModal(inner){closeModal();const m=document.createElement('div');m.i
 function closeModal(){document.getElementById('modal')?.remove()}
 function parseQuick(id){
  const raw=document.getElementById(id).value.trim();if(!raw){toast('กรอกข้อความก่อน');return}
- const plate=(raw.match(/([ก-ฮ]{1,3}\\s*\\d{1,4})/)||[])[1]||'';
- const existing=plate?cars.find(c=>c.plate?.replace(/\\s/g,'')===plate.replace(/\\s/g,'')):null;
- const price=(raw.match(/(?:ซื้อ(?:เข้า)?|ทุน)\\s*([\\d,]+)/i)||[])[1];
- const year=(raw.match(/(?:19|20)\\d{2}/)||[])[0];
- const colors=['ขาว','ดำ','แดง','เทา','เงิน','น้ำเงิน','ฟ้า','เขียว','ครีม','บรอนซ์']; const color=colors.find(x=>raw.includes(x))||'';
+ const pm=raw.match(/(?<![\u0E00-\u0E7F\d])(\d?[ก-ฮ]{1,3})\s*(\d{1,4})(?!\d)/);const plate=pm?pm[1]+pm[2]:'';
+ const existing=plate?cars.find(c=>c.plate?.replace(/\s/g,'')===plate):null;
+ const price=(raw.match(/(?:ซื้อ(?:เข้า)?|ทุน)\s*([\d,]+)/i)||[])[1];
+ const year=(raw.match(/(?<!\d)(?:19|20)\d{2}(?!\d)/)||[])[0];
+ const colors=['ขาว','ดำ','แดง','เทา','น้ำเงิน','เงิน','ฟ้า','เขียว','ครีม','บรอนซ์']; const color=colors.find(x=>raw.includes(x))||'';
  const models=['Yaris','City','March','D-Max','Ranger','CX-5','Civic','Jazz','Fortuner','Hilux','Vios','Almera','Navara'];
  const model=models.find(x=>raw.toLowerCase().includes(x.toLowerCase()))||'';
  let brand=['Toyota','Honda','Nissan','Isuzu','Ford','Mazda','Mitsubishi','Suzuki','MG','BYD','GWM','BMW','Mercedes','Hyundai','Kia'].find(x=>raw.toLowerCase().includes(x.toLowerCase()))||'';
  const out=document.getElementById(id+'Result');
- if(existing){out.innerHTML=`<div class="notice">พบรถเดิม <b>${esc(existing.brand)} ${esc(existing.model)}</b> ทะเบียน <b>${esc(existing.plate||'')}</b><br>ระบบจะไม่สร้างรถใหม่ คุณสามารถเปิดแก้ไขข้อมูลคันเดิมได้</div><button class="btn primary" onclick="closeModal();showEditor(byId('${existing.id}'))">เปิดแก้ไขรถคันนี้</button>`}
- else{out.innerHTML=`<div class="notice">ข้อมูลที่ตรวจพบ: <b>${esc(brand||'')}</b> <b>${esc(model||'')}</b> ${year||''} ${color||''} ${plate||''} ${price?'ซื้อ '+money(Number(price.replace(/,/g,'')))+' บาท':''}</div><button class="btn primary" onclick='closeModal();openEditor(${JSON.stringify({brand,model,year:year||'',plate:plate||'',color,purchase_price:price?Number(price.replace(/,/g,'')):null,status:"รอตรวจสภาพ"}).replace(/</g,"\\\\u003c")})'>เปิดฟอร์มตรวจสอบ</button>`}
+ if(existing){out.innerHTML=`<div class="notice">พบรถเดิม <b>${esc(existing.brand)} ${esc(existing.model)}</b> ทะเบียน <b>${esc(existing.plate||'')}</b><br>ระบบจะไม่สร้างรถใหม่ คุณสามารถเปิดแก้ไขข้อมูลคันเดิมได้</div><button class="btn primary" onclick="closeModal();openEditor(byId('${existing.id}'))">เปิดแก้ไขรถคันนี้</button>`}
+ else{window.__quickDraft={brand,model,year:year||'',plate:plate||'',color,purchase_price:price?Number(price.replace(/,/g,'')):null,status:'รอตรวจสภาพ'};out.innerHTML=`<div class="notice">ข้อมูลที่ตรวจพบ: <b>${esc(brand||'')}</b> <b>${esc(model||'')}</b> ${year||''} ${color||''} ${plate||''} ${price?'ซื้อ '+money(Number(price.replace(/,/g,'')))+' บาท':''}</div><button class="btn primary" onclick="closeModal();openEditor(window.__quickDraft)">เปิดฟอร์มตรวจสอบ</button>`}
 }
 async function applyQuickEdit(carId,id){
  const raw=document.getElementById(id).value.trim();if(!raw){toast('กรอกข้อความก่อน');return}
  const car=byId(carId);const patch={updated_by:me.id};let changed=false;
- const price=raw.match(/ราคาซื้อเข้า\\s*([\\d,]+)/i); if(price){patch.purchase_price=Number(price[1].replace(/,/g,''));changed=true}
- const asking=raw.match(/(?:ราคาตั้งขาย|ตั้งขาย)\\s*([\\d,]+)/i);if(asking){patch.asking_price=Number(asking[1].replace(/,/g,''));changed=true}
- const color=['ขาว','ดำ','แดง','เทา','เงิน','น้ำเงิน','ฟ้า','เขียว','ครีม','บรอนซ์'].find(x=>raw.includes(x));if(color){patch.color=color;changed=true}
- const reg=raw.match(/ทะเบียน\\s*([ก-ฮ]{1,3}\\s*\\d{1,4})/i);if(reg){patch.plate=reg[1];changed=true}
- const year=raw.match(/(?:ปี\\s*)?(19\\d{2}|20\\d{2})/i);if(year){patch.year=Number(year[1]);changed=true}
- const exp=raw.match(/เพิ่ม(?:ค่าซ่อม|ค่าใช้จ่าย)?\\s*([\\d,]+)/i);
+ const price=raw.match(/ราคาซื้อเข้า\s*([\d,]+)/i); if(price){patch.purchase_price=Number(price[1].replace(/,/g,''));changed=true}
+ const asking=raw.match(/(?:ราคาตั้งขาย|ตั้งขาย)\s*([\d,]+)/i);if(asking){patch.asking_price=Number(asking[1].replace(/,/g,''));changed=true}
+ const color=['ขาว','ดำ','แดง','เทา','น้ำเงิน','เงิน','ฟ้า','เขียว','ครีม','บรอนซ์'].find(x=>raw.includes(x));if(color){patch.color=color;changed=true}
+ const reg=raw.match(/ทะเบียน\s*(\d?[ก-ฮ]{1,3}\s*\d{1,4})/i);if(reg){patch.plate=reg[1];changed=true}
+ const year=raw.match(/(?<!\d)(19\d{2}|20\d{2})(?!\d)/);if(year){patch.year=Number(year[1]);changed=true}
+ const exp=raw.match(/เพิ่ม(?:ค่าซ่อม|ค่าใช้จ่าย)?\s*([\d,]+)/i);
  if(exp){const e=await sb.from('car_expenses').insert({car_id:carId,expense_type:'อื่น ๆ',amount:Number(exp[1].replace(/,/g,'')),expense_date:today(),note:'เพิ่มผ่าน Quick Edit',created_by:me.id});if(e.error){toast(e.error.message);return}changed=true}
  if(!changed){toast('ยังอ่านคำสั่งนี้ไม่ได้');return}
  const {error}=await sb.from('cars').update(patch).eq('id',carId);if(error){toast(error.message);return}
@@ -347,8 +348,8 @@ async function saveExpense(e,id){e.preventDefault();const f=new FormData(e.targe
  if(error){toast(error.message);return}await audit(id,'expense_create','เพิ่มค่าใช้จ่าย');closeModal();await reload();openDetail(id);toast('เพิ่มค่าใช้จ่ายแล้ว')}
 function editValuation(id){
  const c=byId(id);showModal(`<div class="sheet"><button class="btn small" style="float:right" onclick="closeModal()">×</button><h2>อัปเดตราคากลาง</h2><div class="notice">กรอกผลที่ตรวจมาเอง ระบบจะเก็บวันที่ข้อมูลและประวัติเดิม</div><form onsubmit="saveValuation(event,'${id}')"><div class="moneyRow">
- <div class="moneyCard"><div class="moneyLabel">TTB</div><div class="field" style="margin-top:6px"><input name="ttb" inputmode="decimal" value="${esc(c.ttb_price??'')}"></div><div class="field" style="margin-top:7px"><label>ข้อมูล ณ วันที่</label><input name="ttbDate" type="date" value="${esc(c.ttb_effective_date||today())}"></div></div>
- <div class="moneyCard"><div class="moneyLabel">Tisco</div><div class="field" style="margin-top:6px"><input name="tisco" inputmode="decimal" value="${esc(c.tisco_price??'')}"></div><div class="field" style="margin-top:7px"><label>ข้อมูล ณ วันที่</label><input name="tiscoDate" type="date" value="${esc(c.tisco_effective_date||today())}"></div></div>
+ <div class="moneyCard"><div class="moneyLabel">TTB</div><div class="field" style="margin-top:6px"><input name="ttb" inputmode="decimal" value="${esc(c.ttb_price??'')}"></div><div class="field" style="margin-top:7px"><label>ข้อมูล ณ วันที่</label><input name="ttbDate" type="date" value="${nDate(c.ttb_effective_date)||today()}"></div></div>
+ <div class="moneyCard"><div class="moneyLabel">Tisco</div><div class="field" style="margin-top:6px"><input name="tisco" inputmode="decimal" value="${esc(c.tisco_price??'')}"></div><div class="field" style="margin-top:7px"><label>ข้อมูล ณ วันที่</label><input name="tiscoDate" type="date" value="${nDate(c.tisco_effective_date)||today()}"></div></div>
  </div><div class="toolbar" style="margin-top:12px"><button class="btn primary">บันทึก</button><button type="button" class="btn" onclick="closeModal()">ยกเลิก</button></div></form></div>`)}
 async function saveValuation(e,id){e.preventDefault();const f=new FormData(e.target);const t=f.get('ttb'),td=f.get('ttbDate'),x=f.get('tisco'),xd=f.get('tiscoDate');
  const patch={updated_by:me.id,ttb_price:t?Number(String(t).replace(/,/g,'')):null,ttb_effective_date:nDate(td),tisco_price:x?Number(String(x).replace(/,/g,'')):null,tisco_effective_date:nDate(xd)};
@@ -357,8 +358,8 @@ async function saveValuation(e,id){e.preventDefault();const f=new FormData(e.tar
  if(rows.length){const r=await sb.from('valuation_history').insert(rows);if(r.error){toast(r.error.message);return}}
  await audit(id,'valuation_update','อัปเดตราคากลาง');closeModal();await reload();openDetail(id);toast('อัปเดตราคากลางแล้ว')}
 function voiceInput(targetId){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast('เบราว์เซอร์นี้ไม่รองรับเสียง');return}const r=new SR();r.lang='th-TH';r.interimResults=false;r.maxAlternatives=1;r.onresult=e=>{const id=targetId||'quickText';const el=document.getElementById(id);if(el)el.value+=(el.value?' ':'')+e.results[0][0].transcript};r.onerror=()=>toast('รับเสียงไม่สำเร็จ');r.start();toast('กำลังฟัง...')}
-async function logout(){if(sb)await sb.auth.signOut();me=null;emp=null;renderLogin()}
-if(sb){sb.auth.onAuthStateChange(()=>setTimeout(boot,0));boot()}else renderLogin();
+async function logout(){me=null;emp=null;if(sb)await sb.auth.signOut();closeModal();closeEditor();renderLogin()}
+if(sb){sb.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT'&&me){me=null;emp=null;closeModal();closeEditor();renderLogin()}});boot()}else renderLogin();
 </script>
 </body>
 </html>
