@@ -1,9 +1,0 @@
-{
-  "name": "น้ำมนต์ 99 Stock",
-  "short_name": "NM99 Stock",
-  "start_url": ".",
-  "display": "standalone",
-  "background_color": "#f7f7f4",
-  "theme_color": "#1d1d1b",
-  "lang": "th"
-}
