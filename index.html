@@ -77,6 +77,41 @@ details[open] summary:after{content:"−"}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 @media(min-width:760px){.container{padding:22px 16px 110px}.editorLayout{display:grid;grid-template-columns:1.2fr .8fr;gap:10px}.fullSection{grid-column:1/-1}}
 @media(max-width:620px){.grid{grid-template-columns:1fr}.moneyRow{grid-template-columns:1fr 1fr}.carTitle{font-size:19px}.container{padding-left:10px;padding-right:10px}.section{padding:12px}.bottomInner .btn{padding:11px 9px}}
+
+/* ===== Modern Editor UI ===== */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(20,20,18,.42);backdrop-filter:blur(8px);display:flex;align-items:flex-end;justify-content:center;padding:0}
+.modal .sheet{width:min(980px,100%);max-height:96vh;overflow:auto;background:#f7f7f4;border:1px solid rgba(255,255,255,.7);border-radius:28px 28px 0 0;box-shadow:0 -18px 60px rgba(0,0,0,.18);padding:20px}
+.modal .sheet h2{font-size:22px;letter-spacing:-.02em;margin:0 0 14px}
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.muted{color:var(--muted);font-size:12px}
+.editorShell{background:#f7f7f4}
+.editorHero{background:linear-gradient(135deg,#171716,#343430);color:#fff;border-radius:24px;padding:20px;margin-bottom:12px;box-shadow:var(--shadow)}
+.editorHero .eyebrow{font-size:11px;opacity:.65;letter-spacing:.08em;text-transform:uppercase}
+.editorHero h2{margin:5px 0 3px;font-size:25px;letter-spacing:-.03em}
+.editorHero p{margin:0;color:rgba(255,255,255,.68);font-size:12px}
+.section{box-shadow:0 3px 16px rgba(20,20,18,.035)}
+.sectionTitle{margin-bottom:14px}
+.sectionTitle strong{font-size:15px;letter-spacing:-.01em}
+.sectionTitle:before{content:"";width:4px;height:18px;border-radius:5px;background:var(--ink);display:block;margin-right:8px}
+.sectionTitle{justify-content:flex-start}
+.sectionTitle .sectionHint{margin-left:auto}
+.field label{font-weight:650;color:#595953}
+input,select,textarea{min-height:44px;border-radius:13px;border-color:#deded7;background:#fcfcfa;transition:.15s}
+input:hover,select:hover,textarea:hover{border-color:#c8c8c0}
+input:focus,select:focus,textarea:focus{border-color:#8f8f87;box-shadow:0 0 0 4px rgba(30,30,28,.06);background:#fff}
+input[type=date]{color-scheme:light}
+.moneyCard{box-shadow:0 2px 9px rgba(20,20,18,.025)}
+.bottomBar{padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));box-shadow:0 -8px 25px rgba(20,20,18,.06)}
+.bottomInner{max-width:980px}
+.bottomInner .btn{min-height:46px}
+.btn{transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.btn:hover{transform:translateY(-1px)}
+.btn.primary:hover{background:#2a2a28}
+.notice{border:1px solid #e5e5df}
+.notice.error{border-color:#f2c9c5}
+@media(min-width:760px){.modal{align-items:center;padding:24px}.modal .sheet{border-radius:28px;max-height:92vh}.editorLayout{grid-template-columns:1.35fr .85fr;align-items:start}}
+@media(max-width:620px){.modal .sheet{padding:12px;border-radius:24px 24px 0 0}.editorHero{padding:16px;border-radius:20px}.editorHero h2{font-size:21px}.sectionTitle .sectionHint{display:none}}
+
 </style>
 </head>
 <body>
@@ -92,8 +127,8 @@ const statuses=['รอตรวจสภาพ','กำลังซ่อม','
 const money=n=>(n===null||n===undefined||n==='')?'—':Number(n).toLocaleString('th-TH',{maximumFractionDigits:0});
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 const today=()=>new Date().toISOString().slice(0,10);
-const fmtDate=s=>s?new Date(s+'T00:00:00').toLocaleDateString('th-TH',{day:'2-digit',month:'2-digit',year:'numeric'}):'ยังไม่ระบุ';
-const nDate=v=>v?String(v):null;
+const fmtDate=s=>{const d=nDate(s);return d?new Date(d+'T00:00:00').toLocaleDateString('th-TH',{day:'2-digit',month:'2-digit',year:'numeric'}):'ยังไม่ระบุ'};
+const nDate=v=>{const s=String(v??'').trim(); if(!s) return null; const m=s.match(/^(\d{4}-\d{2}-\d{2})/); return m?m[1]:null};
 function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');clearTimeout(window.__t);window.__t=setTimeout(()=>e.classList.remove('show'),1900)}
 function age(d){if(!d)return '-';return Math.max(0,Math.floor((Date.now()-new Date(d+'T00:00:00'))/86400000))}
 function totalExp(id){return expenses.filter(x=>x.car_id===id).reduce((a,x)=>a+Number(x.amount||0),0)}
@@ -192,16 +227,21 @@ function openDetail(id){
 function showEditor(c={}){
  document.getElementById('editor')?.remove();
  const m=document.createElement('div');m.id='editor';m.className='modal';m.innerHTML=`<div class="sheet" style="width:100%;max-width:860px;max-height:94vh;overflow:auto;background:var(--bg);padding:0">
-   <div style="position:sticky;top:0;z-index:2;background:rgba(245,245,242,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
-     <div><b>${c.id?'แก้ไขข้อมูลรถ':'เพิ่มรถ'}</b><div class="subtitle">${c.id?esc(c.brand+' '+c.model):'กรอกเฉพาะข้อมูลที่มี ระบบไม่บังคับทุกช่อง'}</div></div>
-     <button class="btn small" onclick="closeEditor()">×</button>
+   <div style="position:sticky;top:0;z-index:5;background:rgba(247,247,244,.94);backdrop-filter:blur(14px);padding:4px 2px 12px;display:flex;align-items:center;justify-content:space-between">
+     <div><div class="subtitle">น้ำมนต์ 99 STOCK</div><b style="font-size:18px">${c.id?'แก้ไขข้อมูลรถ':'เพิ่มรถเข้าสต๊อก'}</b></div>
+     <button class="btn small" onclick="closeEditor()">ปิด</button>
    </div>
-   <div class="container" style="padding-top:12px">
+   <div class="container" style="padding-top:4px">
+     <div class="editorHero">
+       <div class="eyebrow">${c.id?'EDIT VEHICLE':'NEW VEHICLE'}</div>
+       <h2>${c.id?esc((c.brand||'')+' '+(c.model||'')):'สร้างรายการรถใหม่'}</h2>
+       <p>${c.id?'แก้ไขข้อมูลได้ทุกช่อง แล้วกด “บันทึกข้อมูล” ด้านล่าง':'กรอกข้อมูลเท่าที่มีได้เลย ช่องที่ไม่มีข้อมูลสามารถเว้นว่างได้'}</p>
+     </div>
      <div class="editorLayout">
        <div>
-         <div class="section"><div class="sectionTitle"><strong>ข้อมูลหลัก</strong><span class="sectionHint">จำเป็น: ยี่ห้อ + รุ่น</span></div><div class="grid">
-           <div class="field"><label>ยี่ห้อ *</label><input id="f_brand" value="${esc(c.brand||'')}"></div>
-           <div class="field"><label>รุ่น *</label><input id="f_model" value="${esc(c.model||'')}"></div>
+         <div class="section"><div class="sectionTitle"><strong>ข้อมูลหลัก</strong><span class="sectionHint">จำเป็นเฉพาะ ยี่ห้อ และ รุ่น</span></div><div class="grid">
+           <div class="field"><label>ยี่ห้อ *</label><input id="f_brand" autocomplete="off" placeholder="เช่น Toyota" value="${esc(c.brand||'')}"></div>
+           <div class="field"><label>รุ่น *</label><input id="f_model" autocomplete="off" placeholder="เช่น Yaris" value="${esc(c.model||'')}"></div>
            <div class="field"><label>รุ่นย่อย</label><input id="f_trim" value="${esc(c.trim||'')}"></div>
            <div class="field"><label>ปี</label><input id="f_year" inputmode="numeric" placeholder="เช่น 2022" value="${esc(c.year||'')}"></div>
            <div class="field"><label>ทะเบียน</label><input id="f_plate" value="${esc(c.plate||'')}"></div>
@@ -233,19 +273,20 @@ function showEditor(c={}){
 }
 function num(id){const v=document.getElementById(id)?.value?.trim();if(v==='')return null;const n=Number(v.replace(/,/g,''));return Number.isFinite(n)?n:null}
 async function saveEditor(){
+ const saveBtn=document.querySelector('#editor .bottomBar .btn.primary'); if(saveBtn?.disabled)return; if(saveBtn){saveBtn.disabled=true;saveBtn.textContent='กำลังบันทึก…'}
  const brand=document.getElementById('f_brand').value.trim(),model=document.getElementById('f_model').value.trim();
- if(!brand||!model){toast('กรุณากรอกยี่ห้อและรุ่น');return}
- const id=editingId; const row={
+ if(!brand||!model){if(saveBtn){saveBtn.disabled=false;saveBtn.textContent='บันทึกข้อมูล'}toast('กรุณากรอกยี่ห้อและรุ่น');return}
+ const id=editingId; const purchaseDate=nDate(document.getElementById('f_purchase_date').value); const ttbDate=nDate(document.getElementById('f_ttb_date').value); const tiscoDate=nDate(document.getElementById('f_tisco_date').value); const row={
   brand,model,trim:document.getElementById('f_trim').value.trim()||null,
   year:num('f_year'),plate:document.getElementById('f_plate').value.trim()||null,color:document.getElementById('f_color').value.trim()||null,
   vin:document.getElementById('f_vin').value.trim()||null,mileage:num('f_mileage'),
-  purchase_date:nDate(document.getElementById('f_purchase_date').value),purchase_price:num('f_purchase_price')??0,
-  ttb_price:num('f_ttb'),ttb_effective_date:nDate(document.getElementById('f_ttb_date').value),
-  tisco_price:num('f_tisco'),tisco_effective_date:nDate(document.getElementById('f_tisco_date').value),
+  purchase_date:purchaseDate,purchase_price:num('f_purchase_price')??0,
+  ttb_price:num('f_ttb'),ttb_effective_date:ttbDate,
+  tisco_price:num('f_tisco'),tisco_effective_date:tiscoDate,
   asking_price:num('f_asking'),status:document.getElementById('f_status').value,notes:document.getElementById('f_notes').value.trim()||null,updated_by:me.id
  };
  let r=id?await sb.from('cars').update(row).eq('id',id).select().single():await sb.from('cars').insert({...row,created_by:me.id}).select().single();
- if(r.error){toast(r.error.message);console.error(r.error);return}
+ if(r.error){if(saveBtn){saveBtn.disabled=false;saveBtn.textContent='บันทึกข้อมูล'}toast('บันทึกไม่สำเร็จ: '+r.error.message);console.error(r.error);return}
  await audit(r.data.id,id?'update':'create',id?'แก้ไขข้อมูลรถ':'เพิ่มรถ');
  closeEditor();await reload();openDetail(r.data.id);
  toast(id?'อัปเดตรถแล้ว':'เพิ่มรถแล้ว');
