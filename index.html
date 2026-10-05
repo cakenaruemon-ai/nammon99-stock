@@ -429,7 +429,7 @@ function drawBrandList(key){
   const keys=Object.keys(models).sort();const mkey=c=>(all?canonBrand(c.brand)+' ':'')+(canonModel(c.model,c.brand)||'ไม่ระบุ');
   $('brandModels').innerHTML=keys.length>1?`<div class="pad mt12 chips scroll"><button class="chip ${!UI.model?'on':''}" onclick="UI.model='';drawBrandList('${esc(key)}')">ทุกรุ่น</button>${keys.map(m=>`<button class="chip ${UI.model===m?'on':''}" data-m="${esc(m)}" onclick="UI.model=this.dataset.m;drawBrandList('${esc(key)}')">${esc(m)} ${models[m]}</button>`).join('')}</div>`:'';
   const arr=base.filter(c=>!UI.model||mkey(c)===UI.model).sort((a,b)=>(b.updated_at||'').localeCompare(a.updated_at||''));
-  $('brandList').innerHTML=arr.length?arr.map(c=>carCard(c,all||key==='อื่น ๆ')).join(''):'<div class="empty">ยังไม่มีรถในกลุ่มนี้</div>';
+  $('brandList').innerHTML=arr.length?arr.map(c=>carCard(c,all||key==='อื่น ๆ',true)).join(''):'<div class="empty">ยังไม่มีรถในกลุ่มนี้</div>';
 }
 function shortMoney(n){n=Number(n||0);if(Math.abs(n)>=1e6)return (n/1e6).toFixed(2)+'<small> ล.</small>';if(Math.abs(n)>=1e4)return Math.round(n/1e3)+'<small>K</small>';return money(n)}
 function matchCar(c,q){return !q||[c.brand,c.model,c.trim,c.plate,c.color,c.vin,c.year].join(' ').toLowerCase().replace(/\s/g,'').includes(q.toLowerCase().replace(/\s/g,''))}
