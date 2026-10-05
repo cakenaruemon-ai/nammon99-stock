@@ -1,7 +1,7 @@
 // น้ำมนต์ 99 Stock — service worker
 // โหลดจากเน็ตก่อนเสมอ (ได้เวอร์ชันล่าสุดทุกครั้ง) ถ้าออฟไลน์จึงใช้ไฟล์ที่เก็บไว้
 // ไม่เก็บข้อมูลจาก Supabase ลงเครื่อง
-const CACHE = 'nm99-stock-v6';
+const CACHE = 'nm99-stock-v7';
 const SHELL = ['./', './index.html', './config.js', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 
